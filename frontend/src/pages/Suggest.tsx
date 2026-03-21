@@ -38,7 +38,7 @@ export function SuggestPage() {
 
   return (
     <AppLayout>
-      <div className="px-4 pt-safe pt-6">
+      <div className="px-4 lg:px-0 pt-safe pt-6 max-w-lg lg:max-w-xl mx-auto">
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🎲</div>
           <h1 className="text-2xl font-bold text-gray-900">Not sure what to cook?</h1>

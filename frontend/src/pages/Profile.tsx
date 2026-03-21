@@ -19,8 +19,8 @@ export function ProfilePage() {
 
   return (
     <AppLayout>
-      <div className="px-4 pt-safe pt-6">
-        <h1 className="text-xl font-bold text-gray-900 mb-6">Profile</h1>
+      <div className="px-4 lg:px-0 pt-safe pt-6">
+        <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-6">Profile</h1>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
           <div className="flex items-center gap-3">

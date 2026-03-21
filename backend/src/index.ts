@@ -15,6 +15,9 @@ import uploadRoutes from './routes/upload.routes.js';
 
 const app = express();
 
+// Trust the first proxy (needed when running behind Nginx)
+app.set('trust proxy', 1);
+
 // Ensure upload directory exists
 const uploadDir = path.resolve(config.upload.dir);
 if (!fs.existsSync(uploadDir)) {

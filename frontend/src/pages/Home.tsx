@@ -87,21 +87,32 @@ export function HomePage() {
 
   return (
     <AppLayout>
-      {/* Header */}
-      <div className="sticky top-0 z-30 bg-gray-50 px-4 pt-safe pt-4 pb-3">
+      {/* Page header */}
+      <div className="sticky top-0 z-30 bg-gray-50 lg:static lg:bg-transparent px-4 lg:px-0 pt-safe pt-4 lg:pt-0 pb-3">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Dinette</h1>
+            {/* Title shown on mobile only — sidebar has logo on desktop */}
+            <h1 className="text-xl font-bold text-gray-900 lg:hidden">Dinette</h1>
+            <h1 className="hidden lg:block text-2xl font-bold text-gray-900">Recipes</h1>
             <p className="text-xs text-gray-500">{total} recipe{total !== 1 ? 's' : ''}</p>
           </div>
           {isAuthenticated && (
             <button
               onClick={() => navigate('/recipes/new')}
-              className="w-10 h-10 bg-brand-600 rounded-full flex items-center justify-center text-white shadow-sm active:scale-95 transition-transform"
+              className="w-10 h-10 bg-brand-600 rounded-full flex items-center justify-center text-white shadow-sm active:scale-95 transition-transform lg:hidden"
               aria-label="Add recipe"
             >
               <Plus size={20} />
             </button>
+          )}
+          {isAuthenticated && (
+            <Button
+              onClick={() => navigate('/recipes/new')}
+              className="hidden lg:flex items-center gap-2"
+            >
+              <Plus size={16} />
+              New recipe
+            </Button>
           )}
         </div>
         <RecipeFiltersBar
@@ -116,7 +127,7 @@ export function HomePage() {
       </div>
 
       {/* Content */}
-      <div className="px-4">
+      <div className="px-4 lg:px-0">
         {loading ? (
           <div className="flex justify-center py-20">
             <Spinner size="lg" />
@@ -140,7 +151,7 @@ export function HomePage() {
           />
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
               {recipes.map((recipe) => (
                 <RecipeCard key={recipe.id} recipe={recipe} />
               ))}

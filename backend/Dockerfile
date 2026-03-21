@@ -23,7 +23,8 @@ RUN apk add --no-cache openssl
 
 COPY package*.json ./
 COPY prisma ./prisma
-RUN npm ci --omit=dev
+# Install all deps (including tsx) so seed script can run
+RUN npm ci
 
 RUN npx prisma generate
 

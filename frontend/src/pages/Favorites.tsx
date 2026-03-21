@@ -29,12 +29,12 @@ export function FavoritesPage() {
 
   return (
     <AppLayout>
-      <div className="sticky top-0 z-30 bg-gray-50 px-4 pt-safe pt-4 pb-3">
-        <h1 className="text-xl font-bold text-gray-900">Favorites</h1>
+      <div className="sticky top-0 z-30 bg-gray-50 lg:static lg:bg-transparent px-4 lg:px-0 pt-safe pt-4 lg:pt-0 pb-3">
+        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Favorites</h1>
         <p className="text-xs text-gray-500 mt-0.5">{favorites.length} saved recipe{favorites.length !== 1 ? 's' : ''}</p>
       </div>
 
-      <div className="px-4">
+      <div className="px-4 lg:px-0">
         {loading ? (
           <div className="flex justify-center py-20">
             <Spinner size="lg" />
@@ -47,7 +47,7 @@ export function FavoritesPage() {
             action={<Button onClick={() => navigate('/')}>Browse recipes</Button>}
           />
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
             {favorites.map((recipe) => (
               <RecipeCard
                 key={recipe.id}

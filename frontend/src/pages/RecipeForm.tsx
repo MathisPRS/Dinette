@@ -164,9 +164,10 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 max-w-lg mx-auto pb-8">
+    <div className="min-h-screen bg-gray-50 lg:ml-60 pb-20 lg:pb-8">
+      <div className="max-w-2xl mx-auto lg:px-0 lg:pt-6">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3">
+      <div className="sticky top-0 z-30 bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 lg:rounded-2xl lg:mb-4 lg:shadow-sm lg:border">
         <button
           onClick={() => navigate(-1)}
           className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-100"
@@ -186,7 +187,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
         </Button>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 px-4 pt-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 px-4 pt-4 lg:px-0 lg:pt-0">
         {/* Image upload */}
         <div
           className="relative aspect-[4/3] bg-gray-100 rounded-2xl overflow-hidden cursor-pointer border-2 border-dashed border-gray-300 hover:border-brand-400 transition-colors"
@@ -389,6 +390,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
           {mode === 'create' ? 'Create recipe' : 'Save changes'}
         </Button>
       </form>
+      </div>
     </div>
   );
 }
