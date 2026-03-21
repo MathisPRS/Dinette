@@ -9,9 +9,9 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { clsx } from 'clsx';
 
 const CATEGORIES: { label: string; value: Category | undefined }[] = [
-  { label: 'Any category', value: undefined },
-  { label: 'Starters', value: 'STARTER' },
-  { label: 'Main Courses', value: 'MAIN' },
+  { label: 'Toutes catégories', value: undefined },
+  { label: 'Entrées', value: 'STARTER' },
+  { label: 'Plats principaux', value: 'MAIN' },
   { label: 'Desserts', value: 'DESSERT' },
 ];
 
@@ -41,13 +41,13 @@ export function SuggestPage() {
       <div className="px-4 lg:px-0 pt-safe pt-6 max-w-lg lg:max-w-xl mx-auto">
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🎲</div>
-          <h1 className="text-2xl font-bold text-gray-900">Not sure what to cook?</h1>
-          <p className="text-sm text-gray-500 mt-1">Let Dinette pick something for you</p>
+          <h1 className="text-2xl font-bold text-gray-900">Pas d'idée ce soir ?</h1>
+          <p className="text-sm text-gray-500 mt-1">Laissez Dinette choisir pour vous</p>
         </div>
 
         {/* Category selector */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
-          <p className="text-sm font-medium text-gray-700 mb-3">Filter by category</p>
+          <p className="text-sm font-medium text-gray-700 mb-3">Filtrer par catégorie</p>
           <div className="flex flex-col gap-2">
             {CATEGORIES.map(({ label, value }) => (
               <button
@@ -74,7 +74,7 @@ export function SuggestPage() {
           className="w-full mb-6"
         >
           <Shuffle size={18} />
-          {loading ? 'Finding a recipe...' : 'Surprise me!'}
+          {loading ? 'Recherche en cours...' : 'Surprenez-moi !'}
         </Button>
 
         {error && (
@@ -112,7 +112,7 @@ export function SuggestPage() {
                 <span>👥 {suggestion.servings}</span>
               </div>
               <div className="flex items-center justify-between mt-3">
-                <span className="text-sm font-medium text-brand-600">View recipe</span>
+                <span className="text-sm font-medium text-brand-600">Voir la recette</span>
                 <ChevronRight size={16} className="text-brand-600" />
               </div>
             </div>

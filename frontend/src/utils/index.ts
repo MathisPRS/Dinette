@@ -1,9 +1,9 @@
 import type { Category } from '@/types';
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  STARTER: 'Starters',
-  MAIN: 'Main Courses',
-  DESSERT: 'Desserts',
+  STARTER: 'Entrée',
+  MAIN: 'Plat principal',
+  DESSERT: 'Dessert',
 };
 
 export const CATEGORY_EMOJI: Record<Category, string> = {
@@ -29,7 +29,7 @@ export function getImageUrl(path?: string): string {
 export function extractApiError(err: unknown): string {
   if (err && typeof err === 'object' && 'response' in err) {
     const res = (err as { response?: { data?: { error?: string } } }).response;
-    return res?.data?.error ?? 'An error occurred';
+    return res?.data?.error ?? 'Une erreur est survenue';
   }
-  return 'An error occurred';
+  return 'Une erreur est survenue';
 }

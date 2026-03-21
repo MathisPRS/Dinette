@@ -93,8 +93,8 @@ export function HomePage() {
           <div>
             {/* Title shown on mobile only — sidebar has logo on desktop */}
             <h1 className="text-xl font-bold text-gray-900 lg:hidden">Dinette</h1>
-            <h1 className="hidden lg:block text-2xl font-bold text-gray-900">Recipes</h1>
-            <p className="text-xs text-gray-500">{total} recipe{total !== 1 ? 's' : ''}</p>
+            <h1 className="hidden lg:block text-2xl font-bold text-gray-900">Recettes</h1>
+            <p className="text-xs text-gray-500">{total} recette{total !== 1 ? 's' : ''}</p>
           </div>
           {isAuthenticated && (
             <button
@@ -111,7 +111,7 @@ export function HomePage() {
               className="hidden lg:flex items-center gap-2"
             >
               <Plus size={16} />
-              New recipe
+              Nouvelle recette
             </Button>
           )}
         </div>
@@ -135,17 +135,17 @@ export function HomePage() {
         ) : recipes.length === 0 ? (
           <EmptyState
             icon="🍳"
-            title="No recipes yet"
+            title="Aucune recette"
             description={
               search || activeCategory || activeTags.length
-                ? 'No recipes match your filters. Try adjusting them.'
-                : 'Start building your recipe book!'
+                ? 'Aucune recette ne correspond à vos filtres. Essayez de les modifier.'
+                : 'Commencez à construire votre carnet de recettes !'
             }
             action={
               isAuthenticated ? (
-                <Button onClick={() => navigate('/recipes/new')}>Add first recipe</Button>
+                <Button onClick={() => navigate('/recipes/new')}>Ajouter une recette</Button>
               ) : (
-                <Button onClick={() => navigate('/login')}>Sign in to add recipes</Button>
+                <Button onClick={() => navigate('/login')}>Se connecter pour ajouter</Button>
               )
             }
           />

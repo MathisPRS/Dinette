@@ -33,7 +33,7 @@ export function RecipeFiltersBar({
           type="search"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search recipes..."
+          placeholder="Rechercher une recette..."
           className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
         />
         {search && (
@@ -57,7 +57,7 @@ export function RecipeFiltersBar({
               : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
           )}
         >
-          All
+          Toutes
         </button>
         {categories.map((cat) => (
           <button

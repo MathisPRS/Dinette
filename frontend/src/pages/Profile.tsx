@@ -20,7 +20,7 @@ export function ProfilePage() {
   return (
     <AppLayout>
       <div className="px-4 lg:px-0 pt-safe pt-6">
-        <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-6">Profile</h1>
+        <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-6">Profil</h1>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
           <div className="flex items-center gap-3">
@@ -40,7 +40,7 @@ export function ProfilePage() {
             className="flex items-center gap-3 w-full text-left text-red-600 hover:bg-red-50 rounded-xl px-2 py-2 transition-colors"
           >
             <LogOut size={18} />
-            <span className="font-medium">Sign out</span>
+            <span className="font-medium">Se déconnecter</span>
           </button>
         </div>
       </div>

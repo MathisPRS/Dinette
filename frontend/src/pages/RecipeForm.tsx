@@ -175,7 +175,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
           <ArrowLeft size={20} />
         </button>
         <h1 className="font-semibold text-gray-900 flex-1">
-          {mode === 'create' ? 'New Recipe' : 'Edit Recipe'}
+          {mode === 'create' ? 'Nouvelle recette' : 'Modifier la recette'}
         </h1>
         <Button
           type="button"
@@ -183,7 +183,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
           loading={isSubmitting}
           onClick={handleSubmit(onSubmit)}
         >
-          Save
+          Enregistrer
         </Button>
       </div>
 
@@ -198,8 +198,8 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-gray-400">
               <Upload size={32} />
-              <p className="text-sm mt-2 font-medium">Tap to add cover photo</p>
-              <p className="text-xs mt-0.5">JPEG, PNG or WebP, max 5 MB</p>
+              <p className="text-sm mt-2 font-medium">Ajouter une photo de couverture</p>
+              <p className="text-xs mt-0.5">JPEG, PNG ou WebP, max 5 Mo</p>
             </div>
           )}
           <input
@@ -214,14 +214,14 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
         {/* Basic info */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col gap-4">
           <Input
-            label="Title *"
-            placeholder="e.g. Spaghetti Carbonara"
+            label="Titre *"
+            placeholder="ex. Spaghetti Carbonara"
             error={errors.title?.message}
             {...register('title')}
           />
           <Textarea
             label="Description"
-            placeholder="A short description of this recipe..."
+            placeholder="Une courte description de cette recette..."
             rows={3}
             error={errors.description?.message}
             {...register('description')}
@@ -229,7 +229,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
 
           {/* Category */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1.5 block">Category *</label>
+            <label className="text-sm font-medium text-gray-700 mb-1.5 block">Catégorie *</label>
             <div className="flex gap-2">
               {CATEGORIES.map((cat) => {
                 const current = watch('category');
@@ -254,16 +254,16 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
 
           {/* Servings & times */}
           <div className="grid grid-cols-3 gap-3">
-            <Input label="Servings" type="number" min={1} {...register('servings')} />
-            <Input label="Prep (min)" type="number" min={0} {...register('prepTime')} />
-            <Input label="Cook (min)" type="number" min={0} {...register('cookTime')} />
+            <Input label="Portions" type="number" min={1} {...register('servings')} />
+            <Input label="Prép. (min)" type="number" min={0} {...register('prepTime')} />
+            <Input label="Cuisson (min)" type="number" min={0} {...register('cookTime')} />
           </div>
         </div>
 
         {/* Ingredients */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-gray-900">Ingredients *</h2>
+            <h2 className="font-semibold text-gray-900">Ingrédients *</h2>
             <Button
               type="button"
               variant="ghost"
@@ -271,7 +271,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
               onClick={() => appendIngredient({ name: '', quantity: '', unit: '', order: ingredientFields.length })}
             >
               <Plus size={14} />
-              Add
+              Ajouter
             </Button>
           </div>
           {errors.ingredients?.root?.message && (
@@ -283,13 +283,13 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
                 <div className="flex-1 grid grid-cols-5 gap-2">
                   <div className="col-span-2">
                     <Input
-                      placeholder="Name"
+                      placeholder="Nom"
                       error={errors.ingredients?.[i]?.name?.message}
                       {...register(`ingredients.${i}.name`)}
                     />
                   </div>
-                  <Input placeholder="Qty" {...register(`ingredients.${i}.quantity`)} />
-                  <Input placeholder="Unit" {...register(`ingredients.${i}.unit`)} />
+                  <Input placeholder="Qté" {...register(`ingredients.${i}.quantity`)} />
+                  <Input placeholder="Unité" {...register(`ingredients.${i}.unit`)} />
                   <button
                     type="button"
                     onClick={() => removeIngredient(i)}
@@ -315,7 +315,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
               onClick={() => appendStep({ description: '', order: stepFields.length })}
             >
               <Plus size={14} />
-              Add step
+              Ajouter une étape
             </Button>
           </div>
           {errors.steps?.root?.message && (
@@ -329,7 +329,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
                 </span>
                 <Textarea
                   rows={2}
-                  placeholder={`Step ${i + 1}...`}
+                  placeholder={`Étape ${i + 1}...`}
                   error={errors.steps?.[i]?.description?.message}
                   className="flex-1"
                   {...register(`steps.${i}.description`)}
@@ -358,11 +358,11 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') { e.preventDefault(); addTag(); }
               }}
-              placeholder="e.g. vegetarian, quick..."
+              placeholder="ex. végétarien, rapide..."
               className="flex-1 rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
             <Button type="button" variant="secondary" size="sm" onClick={addTag}>
-              Add
+              Ajouter
             </Button>
           </div>
           {tags.length > 0 && (
@@ -387,7 +387,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
         )}
 
         <Button type="submit" size="lg" loading={isSubmitting} className="w-full">
-          {mode === 'create' ? 'Create recipe' : 'Save changes'}
+          {mode === 'create' ? 'Créer la recette' : 'Enregistrer les modifications'}
         </Button>
       </form>
       </div>

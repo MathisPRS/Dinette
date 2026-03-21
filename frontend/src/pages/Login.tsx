@@ -10,8 +10,8 @@ import { Input } from '@/components/ui/Input';
 import { extractApiError } from '@/utils';
 
 const schema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
+  email: z.string().email('Adresse e-mail invalide'),
+  password: z.string().min(1, 'Mot de passe requis'),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -41,25 +41,24 @@ export function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
-        {/* Logo / title */}
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🍽️</div>
           <h1 className="text-2xl font-bold text-gray-900">Dinette</h1>
-          <p className="text-sm text-gray-500 mt-1">Sign in to your recipe book</p>
+          <p className="text-sm text-gray-500 mt-1">Connectez-vous à votre carnet de recettes</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input
-              label="Email"
+              label="E-mail"
               type="email"
               autoComplete="email"
-              placeholder="you@example.com"
+              placeholder="vous@exemple.com"
               error={errors.email?.message}
               {...register('email')}
             />
             <Input
-              label="Password"
+              label="Mot de passe"
               type="password"
               autoComplete="current-password"
               placeholder="••••••••"
@@ -72,15 +71,15 @@ export function LoginPage() {
             )}
 
             <Button type="submit" size="lg" loading={isSubmitting} className="w-full mt-2">
-              Sign in
+              Se connecter
             </Button>
           </form>
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          No account?{' '}
+          Pas encore de compte ?{' '}
           <Link to="/register" className="text-brand-600 font-medium hover:underline">
-            Create one
+            Créer un compte
           </Link>
         </p>
       </div>

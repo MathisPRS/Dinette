@@ -4,11 +4,11 @@ import { clsx } from 'clsx';
 import { useAuthStore } from '@/store/auth';
 
 const NAV_ITEMS = [
-  { to: '/', icon: Home, label: 'Home' },
-  { to: '/favorites', icon: Heart, label: 'Favorites' },
-  { to: '/recipes/new', icon: PlusCircle, label: 'Add Recipe' },
-  { to: '/suggest', icon: Shuffle, label: 'Suggest' },
-  { to: '/profile', icon: User, label: 'Profile' },
+  { to: '/', icon: Home, label: 'Accueil' },
+  { to: '/favorites', icon: Heart, label: 'Favoris' },
+  { to: '/recipes/new', icon: PlusCircle, label: 'Ajouter' },
+  { to: '/suggest', icon: Shuffle, label: 'Suggestion' },
+  { to: '/profile', icon: User, label: 'Profil' },
 ];
 
 export function Sidebar() {
@@ -24,7 +24,7 @@ export function Sidebar() {
           <span className="text-2xl">🍽️</span>
           <span className="text-xl font-bold text-gray-900">Dinette</span>
         </Link>
-        <p className="text-xs text-gray-400 mt-0.5 ml-9">Your recipe book</p>
+        <p className="text-xs text-gray-400 mt-0.5 ml-9">Votre carnet de recettes</p>
       </div>
 
       {/* Navigation */}
@@ -76,7 +76,7 @@ export function Sidebar() {
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl w-full text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
           >
             <LogIn size={18} />
-            Sign in
+            Se connecter
           </button>
         )}
       </div>

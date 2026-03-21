@@ -3,11 +3,11 @@ import { Home, Heart, PlusCircle, Shuffle, User } from 'lucide-react';
 import { clsx } from 'clsx';
 
 const navItems = [
-  { to: '/', icon: Home, label: 'Home' },
-  { to: '/favorites', icon: Heart, label: 'Favorites' },
-  { to: '/recipes/new', icon: PlusCircle, label: 'Add' },
-  { to: '/suggest', icon: Shuffle, label: 'Suggest' },
-  { to: '/profile', icon: User, label: 'Profile' },
+  { to: '/', icon: Home, label: 'Accueil' },
+  { to: '/favorites', icon: Heart, label: 'Favoris' },
+  { to: '/recipes/new', icon: PlusCircle, label: 'Ajouter' },
+  { to: '/suggest', icon: Shuffle, label: 'Suggestion' },
+  { to: '/profile', icon: User, label: 'Profil' },
 ];
 
 export function BottomNav() {

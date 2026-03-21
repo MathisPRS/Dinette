@@ -10,16 +10,16 @@ import { Input } from '@/components/ui/Input';
 import { extractApiError } from '@/utils';
 
 const schema = z.object({
-  name: z.string().min(1, 'Name is required').max(100),
-  email: z.string().email('Invalid email address'),
+  name: z.string().min(1, 'Nom requis').max(100),
+  email: z.string().email('Adresse e-mail invalide'),
   password: z
     .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Must contain an uppercase letter')
-    .regex(/[0-9]/, 'Must contain a number'),
+    .min(8, 'Au moins 8 caractères')
+    .regex(/[A-Z]/, 'Doit contenir une majuscule')
+    .regex(/[0-9]/, 'Doit contenir un chiffre'),
   confirmPassword: z.string(),
 }).refine((d) => d.password === d.confirmPassword, {
-  message: 'Passwords do not match',
+  message: 'Les mots de passe ne correspondent pas',
   path: ['confirmPassword'],
 });
 
@@ -53,37 +53,37 @@ export function RegisterPage() {
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🍽️</div>
           <h1 className="text-2xl font-bold text-gray-900">Dinette</h1>
-          <p className="text-sm text-gray-500 mt-1">Create your recipe book</p>
+          <p className="text-sm text-gray-500 mt-1">Créez votre carnet de recettes</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input
-              label="Name"
+              label="Prénom / Nom"
               type="text"
               autoComplete="name"
-              placeholder="Your name"
+              placeholder="Votre nom"
               error={errors.name?.message}
               {...register('name')}
             />
             <Input
-              label="Email"
+              label="E-mail"
               type="email"
               autoComplete="email"
-              placeholder="you@example.com"
+              placeholder="vous@exemple.com"
               error={errors.email?.message}
               {...register('email')}
             />
             <Input
-              label="Password"
+              label="Mot de passe"
               type="password"
               autoComplete="new-password"
-              placeholder="Min. 8 chars, 1 uppercase, 1 number"
+              placeholder="Min. 8 car., 1 majuscule, 1 chiffre"
               error={errors.password?.message}
               {...register('password')}
             />
             <Input
-              label="Confirm password"
+              label="Confirmer le mot de passe"
               type="password"
               autoComplete="new-password"
               placeholder="••••••••"
@@ -96,15 +96,15 @@ export function RegisterPage() {
             )}
 
             <Button type="submit" size="lg" loading={isSubmitting} className="w-full mt-2">
-              Create account
+              Créer mon compte
             </Button>
           </form>
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          Already have an account?{' '}
+          Déjà un compte ?{' '}
           <Link to="/login" className="text-brand-600 font-medium hover:underline">
-            Sign in
+            Se connecter
           </Link>
         </p>
       </div>

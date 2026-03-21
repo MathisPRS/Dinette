@@ -1,10 +1,11 @@
 import { Heart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
 import type { RecipeSummary } from '@/types';
 import { CATEGORY_LABELS, formatTime, getImageUrl } from '@/utils';
 import { favoritesApi } from '@/api/favorites';
 import { useAuthStore } from '@/store/auth';
+import { useRecipeSheet } from '@/context/RecipeSheetContext';
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 interface RecipeCardProps {
@@ -15,6 +16,7 @@ interface RecipeCardProps {
 export function RecipeCard({ recipe, onFavoriteToggle }: RecipeCardProps) {
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { openSheet } = useRecipeSheet();
   const [isFavorite, setIsFavorite] = useState(recipe.isFavorite);
   const [loading, setLoading] = useState(false);
 
@@ -44,8 +46,8 @@ export function RecipeCard({ recipe, onFavoriteToggle }: RecipeCardProps) {
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer active:scale-95 transition-transform"
-      onClick={() => navigate(`/recipes/${recipe.id}`)}
+      className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150"
+      onClick={() => openSheet(recipe.id)}
     >
       {/* Image */}
       <div className="relative aspect-[4/3] bg-gray-100">
@@ -68,7 +70,7 @@ export function RecipeCard({ recipe, onFavoriteToggle }: RecipeCardProps) {
             'transition-colors active:scale-90',
             isFavorite ? 'text-red-500' : 'text-gray-400 hover:text-red-400'
           )}
-          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
         >
           <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} />
         </button>

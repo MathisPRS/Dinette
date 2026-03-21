@@ -30,8 +30,8 @@ export function FavoritesPage() {
   return (
     <AppLayout>
       <div className="sticky top-0 z-30 bg-gray-50 lg:static lg:bg-transparent px-4 lg:px-0 pt-safe pt-4 lg:pt-0 pb-3">
-        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Favorites</h1>
-        <p className="text-xs text-gray-500 mt-0.5">{favorites.length} saved recipe{favorites.length !== 1 ? 's' : ''}</p>
+        <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Favoris</h1>
+        <p className="text-xs text-gray-500 mt-0.5">{favorites.length} recette{favorites.length !== 1 ? 's' : ''} sauvegardée{favorites.length !== 1 ? 's' : ''}</p>
       </div>
 
       <div className="px-4 lg:px-0">
@@ -42,9 +42,9 @@ export function FavoritesPage() {
         ) : favorites.length === 0 ? (
           <EmptyState
             icon={<Heart size={40} className="text-gray-300" />}
-            title="No favorites yet"
-            description="Tap the heart on any recipe to save it here."
-            action={<Button onClick={() => navigate('/')}>Browse recipes</Button>}
+            title="Aucun favori"
+            description="Appuyez sur le cœur d'une recette pour la sauvegarder ici."
+            action={<Button onClick={() => navigate('/')}>Parcourir les recettes</Button>}
           />
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">

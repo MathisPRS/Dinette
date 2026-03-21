@@ -8,6 +8,8 @@ import { RecipeFormPage } from '@/pages/RecipeForm';
 import { FavoritesPage } from '@/pages/Favorites';
 import { SuggestPage } from '@/pages/Suggest';
 import { ProfilePage } from '@/pages/Profile';
+import { RecipeSheetProvider } from '@/context/RecipeSheetContext';
+import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import type { ReactNode } from 'react';
 
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -19,53 +21,58 @@ function RequireAuth({ children }: { children: ReactNode }) {
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Public */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+      <RecipeSheetProvider>
+        <Routes>
+          {/* Public */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
-        {/* Semi-public (viewable without auth, but auth optional) */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/recipes/:id" element={<RecipeDetailPage />} />
-        <Route path="/suggest" element={<SuggestPage />} />
+          {/* Semi-public */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/recipes/:id" element={<RecipeDetailPage />} />
+          <Route path="/suggest" element={<SuggestPage />} />
 
-        {/* Protected */}
-        <Route
-          path="/recipes/new"
-          element={
-            <RequireAuth>
-              <RecipeFormPage mode="create" />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/recipes/:id/edit"
-          element={
-            <RequireAuth>
-              <RecipeFormPage mode="edit" />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/favorites"
-          element={
-            <RequireAuth>
-              <FavoritesPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <RequireAuth>
-              <ProfilePage />
-            </RequireAuth>
-          }
-        />
+          {/* Protected */}
+          <Route
+            path="/recipes/new"
+            element={
+              <RequireAuth>
+                <RecipeFormPage mode="create" />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/recipes/:id/edit"
+            element={
+              <RequireAuth>
+                <RecipeFormPage mode="edit" />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
+              <RequireAuth>
+                <FavoritesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <RequireAuth>
+                <ProfilePage />
+              </RequireAuth>
+            }
+          />
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+
+        {/* Sheet overlay — disponible partout dans l'appli */}
+        <RecipeSheet />
+      </RecipeSheetProvider>
     </BrowserRouter>
   );
 }
