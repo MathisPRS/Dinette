@@ -1,43 +1,18 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, Plus, Trash2, Upload } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Upload, Camera } from 'lucide-react';
 import { recipeApi } from '@/api/recipes';
-import type { RecipeFormData, Category } from '@/types';
-import { CATEGORY_LABELS } from '@/utils';
+import { groupsApi } from '@/api/groups';
+import type { RecipeFormData, Category, Group } from '@/types';
+import { useCategoryLabels, extractApiError } from '@/utils';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
-import { extractApiError } from '@/utils';
 import { clsx } from 'clsx';
-
-const schema = z.object({
-  title: z.string().min(1, 'Title is required').max(200),
-  description: z.string().max(2000).optional(),
-  category: z.enum(['STARTER', 'MAIN', 'DESSERT']),
-  servings: z.coerce.number().int().min(1).max(100),
-  prepTime: z.coerce.number().int().min(0).optional(),
-  cookTime: z.coerce.number().int().min(0).optional(),
-  ingredients: z
-    .array(
-      z.object({
-        name: z.string().min(1, 'Ingredient name is required'),
-        quantity: z.string().optional(),
-        unit: z.string().optional(),
-        order: z.number(),
-      })
-    )
-    .min(1, 'Add at least one ingredient'),
-  steps: z
-    .array(z.object({ description: z.string().min(1, 'Step description is required'), order: z.number() }))
-    .min(1, 'Add at least one step'),
-  tagInput: z.string().optional(),
-  tags: z.array(z.string()),
-});
-
-type FormData = z.infer<typeof schema>;
+import { useT } from '@/i18n';
 
 const CATEGORIES: Category[] = ['STARTER', 'MAIN', 'DESSERT'];
 
@@ -48,11 +23,50 @@ interface RecipeFormPageProps {
 export function RecipeFormPage({ mode }: RecipeFormPageProps) {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const [apiError, setApiError] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
   const [tagInput, setTagInput] = useState('');
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(
+    searchParams.get('groupId')
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const t = useT();
+  const categoryLabels = useCategoryLabels();
+
+  // Load user's groups for the group selector
+  useEffect(() => {
+    groupsApi.list().then(setGroups).catch(() => {});
+  }, []);
+
+  const schema = z.object({
+    title: z.string().min(1, t('validation_title_required')).max(200),
+    description: z.string().max(2000).optional(),
+    category: z.enum(['STARTER', 'MAIN', 'DESSERT']),
+    servings: z.coerce.number().int().min(1).max(100),
+    prepTime: z.coerce.number().int().min(0).optional(),
+    cookTime: z.coerce.number().int().min(0).optional(),
+    ingredients: z
+      .array(
+        z.object({
+          name: z.string().min(1, t('validation_ingredient_name_required')),
+          quantity: z.string().optional(),
+          unit: z.string().optional(),
+          order: z.number(),
+        })
+      )
+      .min(1, t('validation_add_ingredient')),
+    steps: z
+      .array(z.object({ description: z.string().min(1, t('validation_step_required')), order: z.number() }))
+      .min(1, t('validation_add_step')),
+    tagInput: z.string().optional(),
+    tags: z.array(z.string()),
+  });
+
+  type FormData = z.infer<typeof schema>;
 
   const {
     register,
@@ -103,10 +117,11 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
             order: i.order,
           })),
           steps: recipe.steps.map((s) => ({ description: s.description, order: s.order })),
-          tags: recipe.tags.map((t) => t.name),
+          tags: recipe.tags.map((tg) => tg.name),
           tagInput: '',
         });
         if (recipe.coverImage) setImagePreview(recipe.coverImage);
+        if (recipe.groupId) setSelectedGroupId(recipe.groupId);
       });
     }
   }, [mode, id, reset]);
@@ -127,7 +142,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
   }
 
   function removeTag(tag: string) {
-    setValue('tags', tags.filter((t) => t !== tag));
+    setValue('tags', tags.filter((tg) => tg !== tag));
   }
 
   async function onSubmit(data: FormData) {
@@ -143,6 +158,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
         ingredients: data.ingredients.map((ing, i) => ({ ...ing, order: i })),
         steps: data.steps.map((step, i) => ({ ...step, order: i })),
         tags: data.tags,
+        groupId: selectedGroupId ?? null,
       };
 
       let recipe;
@@ -164,7 +180,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 lg:ml-60 pb-20 lg:pb-8">
+    <div className="min-h-screen bg-gray-50 lg:ml-60 pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-8">
       <div className="max-w-2xl mx-auto lg:px-0 lg:pt-6">
       {/* Header */}
       <div className="sticky top-0 z-30 bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 lg:rounded-2xl lg:mb-4 lg:shadow-sm lg:border">
@@ -175,7 +191,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
           <ArrowLeft size={20} />
         </button>
         <h1 className="font-semibold text-gray-900 flex-1">
-          {mode === 'create' ? 'Nouvelle recette' : 'Modifier la recette'}
+          {mode === 'create' ? t('form_create_title') : t('form_edit_title')}
         </h1>
         <Button
           type="button"
@@ -183,29 +199,60 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
           loading={isSubmitting}
           onClick={handleSubmit(onSubmit)}
         >
-          Enregistrer
+          {t('form_save')}
         </Button>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 px-4 pt-4 lg:px-0 lg:pt-0">
         {/* Image upload */}
-        <div
-          className="relative aspect-[4/3] bg-gray-100 rounded-2xl overflow-hidden cursor-pointer border-2 border-dashed border-gray-300 hover:border-brand-400 transition-colors"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {imagePreview ? (
-            <img src={imagePreview} alt="Cover" className="w-full h-full object-cover" />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-gray-400">
-              <Upload size={32} />
-              <p className="text-sm mt-2 font-medium">Ajouter une photo de couverture</p>
-              <p className="text-xs mt-0.5">JPEG, PNG ou WebP, max 5 Mo</p>
-            </div>
-          )}
+        <div className="flex flex-col gap-2">
+          <div
+            className="relative aspect-[4/3] bg-gray-100 rounded-2xl overflow-hidden border-2 border-dashed border-gray-300"
+          >
+            {imagePreview ? (
+              <img src={imagePreview} alt="Cover" className="w-full h-full object-cover" />
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                <Upload size={32} />
+                <p className="text-sm mt-2 font-medium">{t('form_cover_photo')}</p>
+                <p className="text-xs mt-0.5">{t('form_cover_hint')}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Photo action buttons */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Upload size={16} />
+              {t('form_cover_gallery')}
+            </button>
+            <button
+              type="button"
+              onClick={() => cameraInputRef.current?.click()}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Camera size={16} />
+              {t('form_cover_camera')}
+            </button>
+          </div>
+
+          {/* Hidden inputs */}
           <input
             ref={fileInputRef}
             type="file"
             accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleImageChange}
+          />
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            capture="environment"
             className="hidden"
             onChange={handleImageChange}
           />
@@ -214,14 +261,14 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
         {/* Basic info */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col gap-4">
           <Input
-            label="Titre *"
-            placeholder="ex. Spaghetti Carbonara"
+            label={t('form_title_label')}
+            placeholder={t('form_title_placeholder')}
             error={errors.title?.message}
             {...register('title')}
           />
           <Textarea
-            label="Description"
-            placeholder="Une courte description de cette recette..."
+            label={t('form_description_label')}
+            placeholder={t('form_description_placeholder')}
             rows={3}
             error={errors.description?.message}
             {...register('description')}
@@ -229,7 +276,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
 
           {/* Category */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1.5 block">Catégorie *</label>
+            <label className="text-sm font-medium text-gray-700 mb-1.5 block">{t('form_category_label')}</label>
             <div className="flex gap-2">
               {CATEGORIES.map((cat) => {
                 const current = watch('category');
@@ -245,7 +292,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
                         : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                     )}
                   >
-                    {CATEGORY_LABELS[cat].replace(' Courses', '')}
+                    {categoryLabels[cat]}
                   </button>
                 );
               })}
@@ -254,16 +301,16 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
 
           {/* Servings & times */}
           <div className="grid grid-cols-3 gap-3">
-            <Input label="Portions" type="number" min={1} {...register('servings')} />
-            <Input label="Prép. (min)" type="number" min={0} {...register('prepTime')} />
-            <Input label="Cuisson (min)" type="number" min={0} {...register('cookTime')} />
+            <Input label={t('form_servings')} type="number" min={1} {...register('servings')} />
+            <Input label={t('form_prep_time')} type="number" min={0} {...register('prepTime')} />
+            <Input label={t('form_cook_time')} type="number" min={0} {...register('cookTime')} />
           </div>
         </div>
 
         {/* Ingredients */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-gray-900">Ingrédients *</h2>
+            <h2 className="font-semibold text-gray-900">{t('form_ingredients_title')}</h2>
             <Button
               type="button"
               variant="ghost"
@@ -271,7 +318,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
               onClick={() => appendIngredient({ name: '', quantity: '', unit: '', order: ingredientFields.length })}
             >
               <Plus size={14} />
-              Ajouter
+              {t('form_add')}
             </Button>
           </div>
           {errors.ingredients?.root?.message && (
@@ -283,13 +330,13 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
                 <div className="flex-1 grid grid-cols-5 gap-2">
                   <div className="col-span-2">
                     <Input
-                      placeholder="Nom"
+                      placeholder={t('form_ingredient_name')}
                       error={errors.ingredients?.[i]?.name?.message}
                       {...register(`ingredients.${i}.name`)}
                     />
                   </div>
-                  <Input placeholder="Qté" {...register(`ingredients.${i}.quantity`)} />
-                  <Input placeholder="Unité" {...register(`ingredients.${i}.unit`)} />
+                  <Input placeholder={t('form_ingredient_qty')} {...register(`ingredients.${i}.quantity`)} />
+                  <Input placeholder={t('form_ingredient_unit')} {...register(`ingredients.${i}.unit`)} />
                   <button
                     type="button"
                     onClick={() => removeIngredient(i)}
@@ -307,7 +354,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
         {/* Steps */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-gray-900">Instructions *</h2>
+            <h2 className="font-semibold text-gray-900">{t('form_steps_title')}</h2>
             <Button
               type="button"
               variant="ghost"
@@ -315,7 +362,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
               onClick={() => appendStep({ description: '', order: stepFields.length })}
             >
               <Plus size={14} />
-              Ajouter une étape
+              {t('form_add_step')}
             </Button>
           </div>
           {errors.steps?.root?.message && (
@@ -329,7 +376,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
                 </span>
                 <Textarea
                   rows={2}
-                  placeholder={`Étape ${i + 1}...`}
+                  placeholder={t('form_step_placeholder', { n: i + 1 })}
                   error={errors.steps?.[i]?.description?.message}
                   className="flex-1"
                   {...register(`steps.${i}.description`)}
@@ -347,9 +394,47 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
           </div>
         </div>
 
+        {/* Group selector */}
+        {groups.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+            <label className="text-sm font-medium text-gray-700 mb-2 block">
+              {t('form_group_label')}
+            </label>
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedGroupId(null)}
+                className={clsx(
+                  'flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-colors text-left',
+                  selectedGroupId === null
+                    ? 'bg-brand-600 text-white border-brand-600'
+                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                )}
+              >
+                {t('form_group_none')}
+              </button>
+              {groups.map((g) => (
+                <button
+                  key={g.id}
+                  type="button"
+                  onClick={() => setSelectedGroupId(g.id)}
+                  className={clsx(
+                    'flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-colors text-left',
+                    selectedGroupId === g.id
+                      ? 'bg-brand-600 text-white border-brand-600'
+                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                  )}
+                >
+                  {g.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Tags */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-          <h2 className="font-semibold text-gray-900 mb-3">Tags</h2>
+          <h2 className="font-semibold text-gray-900 mb-3">{t('form_tags_title')}</h2>
           <div className="flex gap-2">
             <input
               type="text"
@@ -358,11 +443,11 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') { e.preventDefault(); addTag(); }
               }}
-              placeholder="ex. végétarien, rapide..."
+              placeholder={t('form_tag_placeholder')}
               className="flex-1 rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
             <Button type="button" variant="secondary" size="sm" onClick={addTag}>
-              Ajouter
+              {t('form_add')}
             </Button>
           </div>
           {tags.length > 0 && (
@@ -387,7 +472,7 @@ export function RecipeFormPage({ mode }: RecipeFormPageProps) {
         )}
 
         <Button type="submit" size="lg" loading={isSubmitting} className="w-full">
-          {mode === 'create' ? 'Créer la recette' : 'Enregistrer les modifications'}
+          {mode === 'create' ? t('form_create_submit') : t('form_edit_submit')}
         </Button>
       </form>
       </div>

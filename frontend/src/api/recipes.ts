@@ -8,6 +8,7 @@ export const recipeApi = {
     if (filters.category) params.category = filters.category;
     if (filters.tags?.length) params.tags = filters.tags.join(',');
     if (filters.ingredient) params.ingredient = filters.ingredient;
+    if (filters.groupId) params.groupId = filters.groupId;
     if (filters.page) params.page = filters.page;
     if (filters.limit) params.limit = filters.limit;
     return api.get<PaginatedResponse<RecipeSummary>>('/recipes', { params }).then((r) => r.data);

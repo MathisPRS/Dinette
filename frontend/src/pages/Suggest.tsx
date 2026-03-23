@@ -3,24 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import { Shuffle, ChevronRight } from 'lucide-react';
 import { recipeApi } from '@/api/recipes';
 import type { Recipe, Category } from '@/types';
-import { CATEGORY_LABELS, getImageUrl, formatTime, extractApiError } from '@/utils';
+import { useCategoryLabels, getImageUrl, formatTime, extractApiError } from '@/utils';
 import { Button } from '@/components/ui/Button';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { clsx } from 'clsx';
-
-const CATEGORIES: { label: string; value: Category | undefined }[] = [
-  { label: 'Toutes catégories', value: undefined },
-  { label: 'Entrées', value: 'STARTER' },
-  { label: 'Plats principaux', value: 'MAIN' },
-  { label: 'Desserts', value: 'DESSERT' },
-];
+import { useT } from '@/i18n';
 
 export function SuggestPage() {
   const navigate = useNavigate();
+  const t = useT();
+  const categoryLabels = useCategoryLabels();
   const [category, setCategory] = useState<Category | undefined>();
   const [suggestion, setSuggestion] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const CATEGORIES: { label: string; value: Category | undefined }[] = [
+    { label: t('category_all'), value: undefined },
+    { label: t('category_starters'), value: 'STARTER' },
+    { label: t('category_mains'), value: 'MAIN' },
+    { label: t('category_desserts'), value: 'DESSERT' },
+  ];
 
   async function getSuggestion() {
     setLoading(true);
@@ -38,16 +41,16 @@ export function SuggestPage() {
 
   return (
     <AppLayout>
-      <div className="px-4 lg:px-0 pt-safe pt-6 max-w-lg lg:max-w-xl mx-auto">
+      <div className="px-4 lg:px-0 pt-6 max-w-lg lg:max-w-xl mx-auto">
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🎲</div>
-          <h1 className="text-2xl font-bold text-gray-900">Pas d'idée ce soir ?</h1>
-          <p className="text-sm text-gray-500 mt-1">Laissez Dinette choisir pour vous</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('suggest_title')}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t('suggest_subtitle')}</p>
         </div>
 
         {/* Category selector */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
-          <p className="text-sm font-medium text-gray-700 mb-3">Filtrer par catégorie</p>
+          <p className="text-sm font-medium text-gray-700 mb-3">{t('suggest_filter_label')}</p>
           <div className="flex flex-col gap-2">
             {CATEGORIES.map(({ label, value }) => (
               <button
@@ -74,7 +77,7 @@ export function SuggestPage() {
           className="w-full mb-6"
         >
           <Shuffle size={18} />
-          {loading ? 'Recherche en cours...' : 'Surprenez-moi !'}
+          {loading ? t('suggest_loading') : t('suggest_button')}
         </Button>
 
         {error && (
@@ -99,7 +102,7 @@ export function SuggestPage() {
             </div>
             <div className="p-4">
               <span className="text-xs font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">
-                {CATEGORY_LABELS[suggestion.category]}
+                {categoryLabels[suggestion.category]}
               </span>
               <h2 className="text-lg font-bold text-gray-900 mt-2">{suggestion.title}</h2>
               {suggestion.description && (
@@ -112,7 +115,7 @@ export function SuggestPage() {
                 <span>👥 {suggestion.servings}</span>
               </div>
               <div className="flex items-center justify-between mt-3">
-                <span className="text-sm font-medium text-brand-600">Voir la recette</span>
+                <span className="text-sm font-medium text-brand-600">{t('suggest_view_recipe')}</span>
                 <ChevronRight size={16} className="text-brand-600" />
               </div>
             </div>

@@ -1,7 +1,8 @@
 import { Search, X } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { Category } from '@/types';
-import { CATEGORY_LABELS } from '@/utils';
+import { useCategoryLabels } from '@/utils';
+import { useT } from '@/i18n';
 
 interface RecipeFiltersBarProps {
   search: string;
@@ -24,6 +25,9 @@ export function RecipeFiltersBar({
   onTagToggle,
   availableTags,
 }: RecipeFiltersBarProps) {
+  const t = useT();
+  const categoryLabels = useCategoryLabels();
+
   return (
     <div className="flex flex-col gap-3">
       {/* Search bar */}
@@ -33,7 +37,7 @@ export function RecipeFiltersBar({
           type="search"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Rechercher une recette..."
+          placeholder={t('filter_search_placeholder')}
           className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
         />
         {search && (
@@ -57,7 +61,7 @@ export function RecipeFiltersBar({
               : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
           )}
         >
-          Toutes
+          {t('filter_all')}
         </button>
         {categories.map((cat) => (
           <button
@@ -70,7 +74,7 @@ export function RecipeFiltersBar({
                 : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
             )}
           >
-            {CATEGORY_LABELS[cat]}
+            {categoryLabels[cat]}
           </button>
         ))}
       </div>

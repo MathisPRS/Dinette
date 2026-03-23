@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { recipeApi } from '@/api/recipes';
 import { tagsApi } from '@/api/tags';
-import { useAuthStore } from '@/store/auth';
 import type { RecipeSummary, Category } from '@/types';
 import { RecipeCard } from '@/components/recipe/RecipeCard';
 import { RecipeFiltersBar } from '@/components/recipe/RecipeFiltersBar';
@@ -11,12 +10,13 @@ import { Spinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { useT } from '@/i18n';
 
 const LIMIT = 20;
 
 export function HomePage() {
   const navigate = useNavigate();
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const t = useT();
 
   const [recipes, setRecipes] = useState<RecipeSummary[]>([]);
   const [total, setTotal] = useState(0);
@@ -33,7 +33,7 @@ export function HomePage() {
 
   // Load tags
   useEffect(() => {
-    tagsApi.list().then((tags) => setAvailableTags(tags.map((t) => t.name)));
+    tagsApi.list().then((tags) => setAvailableTags(tags.map((tag) => tag.name)));
   }, []);
 
   const fetchRecipes = useCallback(
@@ -79,41 +79,49 @@ export function HomePage() {
     );
   }
 
+  function handleFavoriteToggle(id: string, isFav: boolean) {
+    // Sync isFavorite state in the list when toggled from RecipeCard
+    setRecipes((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, isFavorite: isFav } : r))
+    );
+  }
+
   function handleLoadMore() {
     const nextPage = page + 1;
     setPage(nextPage);
     fetchRecipes(false);
   }
 
+  const recipeCountLabel =
+    total === 1
+      ? t('home_recipe_count_one')
+      : t('home_recipe_count_other', { count: total });
+
   return (
     <AppLayout>
       {/* Page header */}
-      <div className="sticky top-0 z-30 bg-gray-50 lg:static lg:bg-transparent px-4 lg:px-0 pt-safe pt-4 lg:pt-0 pb-3">
+      <div className="sticky top-0 z-30 bg-gray-50 lg:static lg:bg-transparent px-4 lg:px-0 pt-4 lg:pt-0 pb-3">
         <div className="flex items-center justify-between mb-3">
           <div>
             {/* Title shown on mobile only — sidebar has logo on desktop */}
-            <h1 className="text-xl font-bold text-gray-900 lg:hidden">Dinette</h1>
-            <h1 className="hidden lg:block text-2xl font-bold text-gray-900">Recettes</h1>
-            <p className="text-xs text-gray-500">{total} recette{total !== 1 ? 's' : ''}</p>
+            <h1 className="text-xl font-bold text-gray-900 lg:hidden">{t('home_title_mobile')}</h1>
+            <h1 className="hidden lg:block text-2xl font-bold text-gray-900">{t('home_title_desktop')}</h1>
+            <p className="text-xs text-gray-500">{recipeCountLabel}</p>
           </div>
-          {isAuthenticated && (
-            <button
-              onClick={() => navigate('/recipes/new')}
-              className="w-10 h-10 bg-brand-600 rounded-full flex items-center justify-center text-white shadow-sm active:scale-95 transition-transform lg:hidden"
-              aria-label="Add recipe"
-            >
-              <Plus size={20} />
-            </button>
-          )}
-          {isAuthenticated && (
-            <Button
-              onClick={() => navigate('/recipes/new')}
-              className="hidden lg:flex items-center gap-2"
-            >
-              <Plus size={16} />
-              Nouvelle recette
-            </Button>
-          )}
+          <button
+            onClick={() => navigate('/recipes/new')}
+            className="w-10 h-10 bg-brand-600 rounded-full flex items-center justify-center text-white shadow-sm active:scale-95 transition-transform lg:hidden"
+            aria-label={t('home_add_recipe')}
+          >
+            <Plus size={20} />
+          </button>
+          <Button
+            onClick={() => navigate('/recipes/new')}
+            className="hidden lg:flex items-center gap-2"
+          >
+            <Plus size={16} />
+            {t('home_add_recipe')}
+          </Button>
         </div>
         <RecipeFiltersBar
           search={search}
@@ -135,25 +143,25 @@ export function HomePage() {
         ) : recipes.length === 0 ? (
           <EmptyState
             icon="🍳"
-            title="Aucune recette"
+            title={t('home_empty_title')}
             description={
               search || activeCategory || activeTags.length
-                ? 'Aucune recette ne correspond à vos filtres. Essayez de les modifier.'
-                : 'Commencez à construire votre carnet de recettes !'
+                ? t('home_empty_filtered')
+                : t('home_empty_default')
             }
             action={
-              isAuthenticated ? (
-                <Button onClick={() => navigate('/recipes/new')}>Ajouter une recette</Button>
-              ) : (
-                <Button onClick={() => navigate('/login')}>Se connecter pour ajouter</Button>
-              )
+              <Button onClick={() => navigate('/recipes/new')}>{t('home_empty_add')}</Button>
             }
           />
         ) : (
           <>
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
               {recipes.map((recipe) => (
-                <RecipeCard key={recipe.id} recipe={recipe} />
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  onFavoriteToggle={handleFavoriteToggle}
+                />
               ))}
             </div>
 
@@ -164,7 +172,7 @@ export function HomePage() {
                   onClick={handleLoadMore}
                   loading={loadingMore}
                 >
-                  Load more
+                  {t('home_load_more')}
                 </Button>
               </div>
             )}

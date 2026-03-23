@@ -1,20 +1,23 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Heart, PlusCircle, Shuffle, User, LogIn } from 'lucide-react';
+import { Home, Heart, PlusCircle, Shuffle, User, LogIn, Users } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAuthStore } from '@/store/auth';
-
-const NAV_ITEMS = [
-  { to: '/', icon: Home, label: 'Accueil' },
-  { to: '/favorites', icon: Heart, label: 'Favoris' },
-  { to: '/recipes/new', icon: PlusCircle, label: 'Ajouter' },
-  { to: '/suggest', icon: Shuffle, label: 'Suggestion' },
-  { to: '/profile', icon: User, label: 'Profil' },
-];
+import { useT } from '@/i18n';
 
 export function Sidebar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
+  const t = useT();
+
+  const NAV_ITEMS = [
+    { to: '/', icon: Home, label: t('nav_home') },
+    { to: '/favorites', icon: Heart, label: t('nav_favorites') },
+    { to: '/recipes/new', icon: PlusCircle, label: t('nav_add') },
+    { to: '/groups', icon: Users, label: t('groups_nav') },
+    { to: '/suggest', icon: Shuffle, label: t('nav_suggest') },
+    { to: '/profile', icon: User, label: t('nav_profile') },
+  ];
 
   return (
     <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-60 bg-white border-r border-gray-200 z-40">
@@ -22,9 +25,9 @@ export function Sidebar() {
       <div className="px-6 py-6 border-b border-gray-100">
         <Link to="/" className="flex items-center gap-2">
           <span className="text-2xl">🍽️</span>
-          <span className="text-xl font-bold text-gray-900">Dinette</span>
+          <span className="text-xl font-bold text-gray-900">{t('app_name')}</span>
         </Link>
-        <p className="text-xs text-gray-400 mt-0.5 ml-9">Votre carnet de recettes</p>
+        <p className="text-xs text-gray-400 mt-0.5 ml-9">{t('app_tagline')}</p>
       </div>
 
       {/* Navigation */}
@@ -76,7 +79,7 @@ export function Sidebar() {
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl w-full text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
           >
             <LogIn size={18} />
-            Se connecter
+            {t('login_submit')}
           </button>
         )}
       </div>

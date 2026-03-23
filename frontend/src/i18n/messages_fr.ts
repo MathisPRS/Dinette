@@ -1,0 +1,201 @@
+export const fr = {
+  // App
+  app_name: 'Dinette',
+  app_tagline: 'Votre carnet de recettes',
+
+  // Navigation
+  nav_home: 'Accueil',
+  nav_favorites: 'Favoris',
+  nav_add: 'Ajouter',
+  nav_suggest: 'Suggestion',
+  nav_profile: 'Profil',
+
+  // Auth — Login
+  login_subtitle: 'Connectez-vous à votre carnet de recettes',
+  login_email: 'E-mail',
+  login_email_placeholder: 'vous@exemple.com',
+  login_password: 'Mot de passe',
+  login_submit: 'Se connecter',
+  login_no_account: "Pas encore de compte ?",
+  login_create_account: 'Créer un compte',
+
+  // Auth — Register
+  register_subtitle: 'Créez votre carnet de recettes',
+  register_name: 'Prénom / Nom',
+  register_name_placeholder: 'Votre nom',
+  register_email: 'E-mail',
+  register_email_placeholder: 'vous@exemple.com',
+  register_password: 'Mot de passe',
+  register_password_placeholder: 'Min. 8 car., 1 majuscule, 1 chiffre',
+  register_confirm_password: 'Confirmer le mot de passe',
+  register_submit: 'Créer mon compte',
+  register_has_account: 'Déjà un compte ?',
+  register_login_link: 'Se connecter',
+
+  // Validation
+  validation_email_invalid: 'Adresse e-mail invalide',
+  validation_password_required: 'Mot de passe requis',
+  validation_password_min: 'Au moins 8 caractères',
+  validation_password_uppercase: 'Doit contenir une majuscule',
+  validation_password_number: 'Doit contenir un chiffre',
+  validation_passwords_mismatch: 'Les mots de passe ne correspondent pas',
+  validation_name_required: 'Nom requis',
+  validation_title_required: 'Le titre est requis',
+  validation_ingredient_name_required: "Le nom de l'ingrédient est requis",
+  validation_step_required: "La description de l'étape est requise",
+  validation_add_ingredient: 'Ajoutez au moins un ingrédient',
+  validation_add_step: 'Ajoutez au moins une étape',
+
+  // Home
+  home_title_mobile: 'Dinette',
+  home_title_desktop: 'Recettes',
+  home_recipe_count_one: '1 recette',
+  home_recipe_count_other: '{count} recettes',
+  home_add_recipe: 'Nouvelle recette',
+  home_load_more: 'Voir plus',
+  home_empty_title: 'Aucune recette',
+  home_empty_filtered: 'Aucune recette ne correspond à vos filtres. Essayez de les modifier.',
+  home_empty_default: 'Commencez à construire votre carnet de recettes !',
+  home_empty_add: 'Ajouter une recette',
+  home_empty_login: 'Se connecter pour ajouter',
+
+  // Filters
+  filter_search_placeholder: 'Rechercher une recette...',
+  filter_all: 'Toutes',
+
+  // Categories
+  category_starter: 'Entrée',
+  category_main: 'Plat principal',
+  category_dessert: 'Dessert',
+  category_starters: 'Entrées',
+  category_mains: 'Plats principaux',
+  category_desserts: 'Desserts',
+  category_all: 'Toutes catégories',
+
+  // Favorites
+  favorites_title: 'Favoris',
+  favorites_count_one: '1 recette sauvegardée',
+  favorites_count_other: '{count} recettes sauvegardées',
+  favorites_empty_title: 'Aucun favori',
+  favorites_empty_description: "Appuyez sur le cœur d'une recette pour la sauvegarder ici.",
+  favorites_empty_browse: 'Parcourir les recettes',
+
+  // Recipe card / actions
+  recipe_add_favorite: 'Ajouter aux favoris',
+  recipe_remove_favorite: 'Retirer des favoris',
+
+  // Recipe detail
+  recipe_back: 'Retour',
+  recipe_servings: '{count} portions',
+  recipe_prep: 'Prép.',
+  recipe_cook: 'Cuisson',
+  recipe_total: 'Total',
+  recipe_ingredients_title: 'Ingrédients',
+  recipe_instructions_title: 'Instructions',
+  recipe_edit: 'Modifier',
+  recipe_delete: 'Supprimer',
+  recipe_delete_confirm: 'Supprimer cette recette ? Cette action est irréversible.',
+  recipe_not_found: 'Recette introuvable',
+  recipe_error_generic: "Quelque chose s'est mal passé",
+  recipe_go_home: 'Retour à l\'accueil',
+  recipe_author: 'Recette de {name}',
+  recipe_tab_ingredients: 'Ingrédients ({count})',
+  recipe_tab_steps: 'Instructions ({count})',
+  recipe_uncheck_all: 'Tout décocher',
+  recipe_close: 'Fermer',
+
+  // Recipe form
+  form_create_title: 'Nouvelle recette',
+  form_edit_title: 'Modifier la recette',
+  form_save: 'Enregistrer',
+  form_cover_photo: 'Ajouter une photo de couverture',
+  form_cover_hint: 'JPEG, PNG ou WebP, max 5 Mo',
+  form_title_label: 'Titre *',
+  form_title_placeholder: 'ex. Spaghetti Carbonara',
+  form_description_label: 'Description',
+  form_description_placeholder: 'Une courte description de cette recette...',
+  form_category_label: 'Catégorie *',
+  form_servings: 'Portions',
+  form_prep_time: 'Prép. (min)',
+  form_cook_time: 'Cuisson (min)',
+  form_ingredients_title: 'Ingrédients *',
+  form_add: 'Ajouter',
+  form_ingredient_name: 'Nom',
+  form_ingredient_qty: 'Qté',
+  form_ingredient_unit: 'Unité',
+  form_steps_title: 'Instructions *',
+  form_add_step: 'Ajouter une étape',
+  form_step_placeholder: 'Étape {n}...',
+  form_tags_title: 'Tags',
+  form_tag_placeholder: 'ex. végétarien, rapide...',
+  form_create_submit: 'Créer la recette',
+  form_edit_submit: 'Enregistrer les modifications',
+
+  // Suggest
+  suggest_title: "Pas d'idée ce soir ?",
+  suggest_subtitle: 'Laissez Dinette choisir pour vous',
+  suggest_filter_label: 'Filtrer par catégorie',
+  suggest_button: 'Surprenez-moi !',
+  suggest_loading: 'Recherche en cours...',
+  suggest_view_recipe: 'Voir la recette',
+
+  // Profile
+  profile_title: 'Profil',
+  profile_logout: 'Se déconnecter',
+  profile_language: 'Langue',
+  profile_language_fr: 'Français',
+  profile_language_en: 'English',
+  profile_change_password: 'Changer le mot de passe',
+  profile_current_password: 'Mot de passe actuel',
+  profile_new_password: 'Nouveau mot de passe',
+  profile_confirm_new_password: 'Confirmer le nouveau mot de passe',
+  profile_save_password: 'Enregistrer',
+  profile_password_success: 'Mot de passe modifié avec succès',
+  profile_password_cancel: 'Annuler',
+
+  // Groups
+  groups_nav: 'Groupes',
+  groups_title: 'Mes groupes',
+  groups_create: 'Créer un groupe',
+  groups_join: 'Rejoindre',
+  groups_join_title: 'Rejoindre un groupe',
+  groups_join_code_label: 'Code d\'invitation',
+  groups_join_code_placeholder: 'Ex. ABC123',
+  groups_join_submit: 'Rejoindre',
+  groups_empty_title: 'Aucun groupe',
+  groups_empty_description: 'Créez un groupe familial ou rejoignez-en un avec un code d\'invitation.',
+  groups_create_title: 'Créer un groupe',
+  groups_create_name_label: 'Nom du groupe',
+  groups_create_name_placeholder: 'Ex. Famille Martin',
+  groups_create_submit: 'Créer',
+  groups_members: '{count} membre(s)',
+  groups_invite_code: 'Code d\'invitation',
+  groups_invite_copy: 'Copier',
+  groups_invite_copied: 'Copié !',
+  groups_leave: 'Quitter le groupe',
+  groups_leave_confirm: 'Quitter ce groupe ? Vous ne verrez plus les recettes partagées.',
+  groups_recipes_empty: 'Aucune recette dans ce groupe.',
+  groups_recipes_empty_hint: 'Créez une recette et choisissez ce groupe pour la partager.',
+  groups_back: 'Retour',
+  groups_you_owner: 'Administrateur',
+  groups_member_since: 'Membre depuis {date}',
+
+  // Recipe form — group field
+  form_group_label: 'Partager dans un groupe (optionnel)',
+  form_group_none: 'Personnel (non partagé)',
+
+  // Cover photo
+  form_cover_gallery: 'Choisir une photo',
+  form_cover_camera: 'Prendre une photo',
+
+  // Errors
+  error_generic: 'Une erreur est survenue',
+
+  // Stats labels in sheet
+  stat_prep: 'Préparation',
+  stat_cook: 'Cuisson',
+  stat_servings: 'Portions',
+  stat_total: 'Total',
+} as const;
+
+export type Messages = Record<keyof typeof fr, string>;

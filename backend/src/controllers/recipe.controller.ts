@@ -1,7 +1,23 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import fs from 'fs';
+import path from 'path';
 import { prisma } from '../config/database.js';
+import { config } from '../config/index.js';
 import { Category } from '@prisma/client';
+
+/**
+ * Delete a local upload file given its URL path (e.g. "/uploads/uuid.jpg").
+ * Silently ignores missing files or non-local paths.
+ */
+function deleteUploadedFile(coverImage: string | null | undefined): void {
+  if (!coverImage) return;
+  // Only delete files stored locally (path starts with /uploads/)
+  if (!coverImage.startsWith('/uploads/')) return;
+  const filename = path.basename(coverImage);
+  const filePath = path.resolve(config.upload.dir, filename);
+  fs.unlink(filePath, () => { /* ignore errors */ });
+}
 
 const ingredientSchema = z.object({
   name: z.string().min(1).max(200).trim(),
@@ -25,6 +41,7 @@ const recipeBodySchema = z.object({
   ingredients: z.array(ingredientSchema).min(1),
   steps: z.array(stepSchema).min(1),
   tags: z.array(z.string().min(1).max(50).trim().toLowerCase()).default([]),
+  groupId: z.string().optional().nullable(),
 });
 
 const listQuerySchema = z.object({
@@ -32,6 +49,7 @@ const listQuerySchema = z.object({
   category: z.nativeEnum(Category).optional(),
   tags: z.string().optional(), // comma-separated
   ingredient: z.string().optional(),
+  groupId: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
@@ -47,6 +65,7 @@ const recipeSelect = {
   cookTime: true,
   createdAt: true,
   updatedAt: true,
+  groupId: true,
   author: { select: { id: true, name: true } },
   tags: { select: { tag: { select: { id: true, name: true } } } },
   _count: { select: { favorites: true } },
@@ -69,12 +88,27 @@ export async function listRecipes(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  const { search, category, tags, ingredient, page, limit } = query.data;
+  const { search, category, tags, ingredient, groupId, page, limit } = query.data;
   const skip = (page - 1) * limit;
 
   const tagArray = tags ? tags.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean) : [];
 
+  const userId = req.user!.userId;
+
+  // If filtering by group, verify membership
+  if (groupId) {
+    const membership = await prisma.groupMember.findUnique({
+      where: { userId_groupId: { userId, groupId } },
+    });
+    if (!membership) {
+      res.status(403).json({ error: 'You are not a member of this group' });
+      return;
+    }
+  }
+
   const where = {
+    // Personal recipes: only the authenticated user's; group recipes: filtered by groupId
+    ...(groupId !== undefined ? { groupId } : { groupId: null, authorId: userId }),
     ...(search && {
       title: { contains: search, mode: 'insensitive' as const },
     }),
@@ -98,10 +132,9 @@ export async function listRecipes(req: Request, res: Response): Promise<void> {
     prisma.recipe.count({ where }),
   ]);
 
-  // Attach favorite status if authenticated
-  const userId = req.user?.userId;
+  // Attach favorite status
   let favoriteIds = new Set<string>();
-  if (userId) {
+  {
     const favorites = await prisma.favorite.findMany({
       where: { userId, recipeId: { in: recipes.map((r) => r.id) } },
       select: { recipeId: true },
@@ -131,14 +164,12 @@ export async function getRecipe(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  const userId = req.user?.userId;
+  const userId = req.user!.userId;
   let isFavorite = false;
-  if (userId) {
-    const fav = await prisma.favorite.findUnique({
-      where: { userId_recipeId: { userId, recipeId: id } },
-    });
-    isFavorite = !!fav;
-  }
+  const fav = await prisma.favorite.findUnique({
+    where: { userId_recipeId: { userId, recipeId: id } },
+  });
+  isFavorite = !!fav;
 
   res.json({
     ...recipe,
@@ -157,8 +188,19 @@ export async function createRecipe(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  const { ingredients, steps, tags, ...recipeData } = result.data;
+  const { ingredients, steps, tags, groupId, ...recipeData } = result.data;
   const userId = req.user!.userId;
+
+  // If assigning to a group, verify membership
+  if (groupId) {
+    const membership = await prisma.groupMember.findUnique({
+      where: { userId_groupId: { userId, groupId } },
+    });
+    if (!membership) {
+      res.status(403).json({ error: 'You are not a member of this group' });
+      return;
+    }
+  }
 
   // Upsert tags
   const tagRecords = await Promise.all(
@@ -171,6 +213,7 @@ export async function createRecipe(req: Request, res: Response): Promise<void> {
     data: {
       ...recipeData,
       authorId: userId,
+      groupId: groupId ?? null,
       ingredients: { create: ingredients },
       steps: { create: steps },
       tags: { create: tagRecords.map((t) => ({ tagId: t.id })) },
@@ -185,12 +228,19 @@ export async function updateRecipe(req: Request, res: Response): Promise<void> {
   const id = extractId(req.params['id']);
   const userId = req.user!.userId;
 
-  const existing = await prisma.recipe.findUnique({ where: { id }, select: { authorId: true } });
+  const existing = await prisma.recipe.findUnique({ where: { id }, select: { authorId: true, groupId: true } });
   if (!existing) {
     res.status(404).json({ error: 'Recipe not found' });
     return;
   }
-  if (existing.authorId !== userId) {
+
+  // Allow if author OR a member of the recipe's group
+  const canEdit = existing.authorId === userId ||
+    (existing.groupId !== null && await prisma.groupMember.findUnique({
+      where: { userId_groupId: { userId, groupId: existing.groupId } },
+    }).then(Boolean));
+
+  if (!canEdit) {
     res.status(403).json({ error: 'Forbidden' });
     return;
   }
@@ -253,17 +303,28 @@ export async function deleteRecipe(req: Request, res: Response): Promise<void> {
   const id = extractId(req.params['id']);
   const userId = req.user!.userId;
 
-  const existing = await prisma.recipe.findUnique({ where: { id }, select: { authorId: true } });
+  const existing = await prisma.recipe.findUnique({ where: { id }, select: { authorId: true, coverImage: true, groupId: true } });
   if (!existing) {
     res.status(404).json({ error: 'Recipe not found' });
     return;
   }
-  if (existing.authorId !== userId) {
+
+  // Allow if author OR a member of the recipe's group
+  const canDelete = existing.authorId === userId ||
+    (existing.groupId !== null && await prisma.groupMember.findUnique({
+      where: { userId_groupId: { userId, groupId: existing.groupId } },
+    }).then(Boolean));
+
+  if (!canDelete) {
     res.status(403).json({ error: 'Forbidden' });
     return;
   }
 
   await prisma.recipe.delete({ where: { id } });
+
+  // Clean up cover image file from disk after DB deletion
+  deleteUploadedFile(existing.coverImage);
+
   res.status(204).send();
 }
 
@@ -295,7 +356,7 @@ export async function updateCoverImage(req: Request, res: Response): Promise<voi
   const id = extractId(req.params['id']);
   const userId = req.user!.userId;
 
-  const existing = await prisma.recipe.findUnique({ where: { id }, select: { authorId: true } });
+  const existing = await prisma.recipe.findUnique({ where: { id }, select: { authorId: true, coverImage: true } });
   if (!existing) {
     res.status(404).json({ error: 'Recipe not found' });
     return;
@@ -312,6 +373,9 @@ export async function updateCoverImage(req: Request, res: Response): Promise<voi
 
   const coverImage = `/uploads/${req.file.filename}`;
   await prisma.recipe.update({ where: { id }, data: { coverImage } });
+
+  // Delete the old cover image file from disk
+  deleteUploadedFile(existing.coverImage);
 
   res.json({ coverImage });
 }

@@ -11,7 +11,7 @@ import authRoutes from './routes/auth.routes.js';
 import recipeRoutes from './routes/recipe.routes.js';
 import favoriteRoutes from './routes/favorite.routes.js';
 import tagRoutes from './routes/tag.routes.js';
-import uploadRoutes from './routes/upload.routes.js';
+import groupRoutes from './routes/group.routes.js';
 
 const app = express();
 
@@ -34,7 +34,7 @@ app.use(
 // CORS
 app.use(
   cors({
-    origin: config.frontendUrl,
+    origin: [config.frontendUrl, 'http://192.168.1.9', 'http://192.168.1.9:80'],
     credentials: true,
   })
 );
@@ -65,7 +65,7 @@ app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/tags', tagRoutes);
-app.use('/api/upload', uploadRoutes);
+app.use('/api/groups', groupRoutes);
 
 // 404
 app.use((_req, res) => {

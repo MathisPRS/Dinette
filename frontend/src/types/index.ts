@@ -37,6 +37,7 @@ export interface RecipeSummary {
   cookTime?: number;
   createdAt: string;
   updatedAt: string;
+  groupId?: string | null;
   author: { id: string; name: string };
   tags: Tag[];
   isFavorite: boolean;
@@ -61,6 +62,7 @@ export interface RecipeFilters {
   category?: Category;
   tags?: string[];
   ingredient?: string;
+  groupId?: string;
   page?: number;
   limit?: number;
 }
@@ -75,9 +77,28 @@ export interface RecipeFormData {
   ingredients: { name: string; quantity?: string; unit?: string; order: number }[];
   steps: { description: string; order: number }[];
   tags: string[];
+  groupId?: string | null;
 }
 
 export interface ApiError {
   error: string;
   details?: { field: string; message: string }[];
+}
+
+export interface GroupMember {
+  userId: string;
+  groupId: string;
+  joinedAt: string;
+  user: { id: string; name: string; email: string };
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  inviteCode: string;
+  ownerId: string;
+  createdAt: string;
+  members: GroupMember[];
+  _count: { recipes: number };
+  joinedAt?: string;
 }

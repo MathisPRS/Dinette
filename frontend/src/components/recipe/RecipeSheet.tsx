@@ -10,8 +10,9 @@ import { favoritesApi } from '@/api/favorites';
 import { useAuthStore } from '@/store/auth';
 import { useRecipeSheet } from '@/context/RecipeSheetContext';
 import type { Recipe } from '@/types';
-import { CATEGORY_LABELS, formatTime, getImageUrl, extractApiError } from '@/utils';
+import { useCategoryLabels, formatTime, getImageUrl, extractApiError } from '@/utils';
 import { Spinner } from '@/components/ui/Spinner';
+import { useT } from '@/i18n';
 
 type Tab = 'ingredients' | 'steps';
 
@@ -19,6 +20,8 @@ export function RecipeSheet() {
   const { openRecipeId, closeSheet } = useRecipeSheet();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
+  const t = useT();
+  const categoryLabels = useCategoryLabels();
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(false);
@@ -53,7 +56,7 @@ export function RecipeSheet() {
         // Scroll to top when new recipe loads
         scrollRef.current?.scrollTo({ top: 0 });
       })
-      .catch(() => setError('Recette introuvable'))
+      .catch(() => setError(t('recipe_not_found')))
       .finally(() => setLoading(false));
   }, [openRecipeId]);
 
@@ -90,7 +93,7 @@ export function RecipeSheet() {
   }
 
   async function handleDelete() {
-    if (!confirm('Supprimer cette recette ? Cette action est irréversible.')) return;
+    if (!confirm(t('recipe_delete_confirm'))) return;
     setDeleting(true);
     try {
       await recipeApi.delete(openRecipeId!);
@@ -116,6 +119,8 @@ export function RecipeSheet() {
   }
 
   const isOwner = recipe && user?.id === recipe.author.id;
+  // Any authenticated user can edit/delete group recipes (backend enforces membership)
+  const canEdit = isOwner || (!!recipe?.groupId && !!user);
   const totalTime = recipe ? (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0) : 0;
 
   return (
@@ -133,13 +138,9 @@ export function RecipeSheet() {
       />
 
       {/* ── Sheet panel ─────────────────────────────── */}
-      {/*
-        Desktop : glisse depuis la droite (translate-x)
-        Mobile  : monte depuis le bas (translate-y), 90vh, coins arrondis en haut
-      */}
       <div
         className={clsx(
-          'fixed z-50 bg-white shadow-2xl transition-transform duration-300 ease-out',
+          'fixed z-50 bg-white shadow-2xl transition-transform duration-300 ease-out flex flex-col',
           // Desktop : panneau latéral droit
           'lg:inset-y-0 lg:right-0 lg:w-[580px] lg:rounded-none',
           // Mobile : bottom sheet
@@ -157,8 +158,7 @@ export function RecipeSheet() {
         {/* Content — scrollable */}
         <div
           ref={scrollRef}
-          className="overflow-y-auto h-full pb-safe"
-          style={{ maxHeight: 'calc(92vh - 20px)' }}
+          className="flex-1 min-h-0 overflow-y-auto pb-safe lg:pb-0"
         >
           {loading && (
             <div className="flex items-center justify-center h-64">
@@ -173,7 +173,7 @@ export function RecipeSheet() {
                 onClick={closeSheet}
                 className="text-sm text-brand-600 font-medium"
               >
-                Fermer
+                {t('recipe_close')}
               </button>
             </div>
           )}
@@ -198,7 +198,7 @@ export function RecipeSheet() {
                 <button
                   onClick={closeSheet}
                   className="absolute top-3 left-3 w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
-                  aria-label="Fermer"
+                  aria-label={t('recipe_close')}
                 >
                   <X size={18} />
                 </button>
@@ -214,16 +214,16 @@ export function RecipeSheet() {
                         ? 'bg-red-500 text-white'
                         : 'bg-black/40 text-white hover:bg-black/60'
                     )}
-                    aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                    aria-label={isFavorite ? t('recipe_remove_favorite') : t('recipe_add_favorite')}
                   >
                     <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} />
                   </button>
-                  {isOwner && (
+                  {canEdit && (
                     <>
                       <button
                         onClick={handleEdit}
                         className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
-                        aria-label="Modifier"
+                        aria-label={t('recipe_edit')}
                       >
                         <Pencil size={16} />
                       </button>
@@ -231,7 +231,7 @@ export function RecipeSheet() {
                         onClick={handleDelete}
                         disabled={deleting}
                         className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-red-500 transition-colors"
-                        aria-label="Supprimer"
+                        aria-label={t('recipe_delete')}
                       >
                         <Trash2 size={16} />
                       </button>
@@ -242,7 +242,7 @@ export function RecipeSheet() {
                 {/* Category badge bottom-left */}
                 <div className="absolute bottom-3 left-4">
                   <span className="text-xs font-semibold text-white bg-brand-600 px-2.5 py-1 rounded-full">
-                    {CATEGORY_LABELS[recipe.category]}
+                    {categoryLabels[recipe.category]}
                   </span>
                 </div>
               </div>
@@ -279,26 +279,26 @@ export function RecipeSheet() {
                   {recipe.prepTime != null && recipe.prepTime > 0 && (
                     <StatCard
                       icon={<Clock size={18} className="text-blue-500" />}
-                      label="Préparation"
+                      label={t('stat_prep')}
                       value={formatTime(recipe.prepTime)}
                     />
                   )}
                   {recipe.cookTime != null && recipe.cookTime > 0 && (
                     <StatCard
                       icon={<Flame size={18} className="text-orange-500" />}
-                      label="Cuisson"
+                      label={t('stat_cook')}
                       value={formatTime(recipe.cookTime)}
                     />
                   )}
                   <StatCard
                     icon={<Users size={18} className="text-green-500" />}
-                    label="Portions"
+                    label={t('stat_servings')}
                     value={String(recipe.servings)}
                   />
                   {totalTime > 0 && (
                     <StatCard
                       icon={<ChefHat size={18} className="text-purple-500" />}
-                      label="Total"
+                      label={t('stat_total')}
                       value={formatTime(totalTime)}
                     />
                   )}
@@ -312,12 +312,12 @@ export function RecipeSheet() {
                   <TabButton
                     active={tab === 'ingredients'}
                     onClick={() => setTab('ingredients')}
-                    label={`Ingrédients (${recipe.ingredients.length})`}
+                    label={t('recipe_tab_ingredients', { count: recipe.ingredients.length })}
                   />
                   <TabButton
                     active={tab === 'steps'}
                     onClick={() => setTab('steps')}
-                    label={`Instructions (${recipe.steps.length})`}
+                    label={t('recipe_tab_steps', { count: recipe.steps.length })}
                   />
                 </div>
 
@@ -359,7 +359,7 @@ export function RecipeSheet() {
                         onClick={() => setCheckedIngredients(new Set())}
                         className="mt-2 text-xs text-gray-400 hover:text-gray-600 self-start ml-3"
                       >
-                        Tout décocher
+                        {t('recipe_uncheck_all')}
                       </button>
                     )}
                   </div>
@@ -383,7 +383,7 @@ export function RecipeSheet() {
 
                 {/* Author */}
                 <p className="mt-6 text-xs text-gray-400 text-center">
-                  Recette de <span className="font-medium text-gray-500">{recipe.author.name}</span>
+                  {t('recipe_author', { name: recipe.author.name })}
                 </p>
               </div>
             </>

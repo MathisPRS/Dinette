@@ -8,27 +8,28 @@ import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { extractApiError } from '@/utils';
-
-const schema = z.object({
-  name: z.string().min(1, 'Nom requis').max(100),
-  email: z.string().email('Adresse e-mail invalide'),
-  password: z
-    .string()
-    .min(8, 'Au moins 8 caractères')
-    .regex(/[A-Z]/, 'Doit contenir une majuscule')
-    .regex(/[0-9]/, 'Doit contenir un chiffre'),
-  confirmPassword: z.string(),
-}).refine((d) => d.password === d.confirmPassword, {
-  message: 'Les mots de passe ne correspondent pas',
-  path: ['confirmPassword'],
-});
-
-type FormData = z.infer<typeof schema>;
+import { useT } from '@/i18n';
 
 export function RegisterPage() {
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
   const [apiError, setApiError] = useState('');
+  const t = useT();
+
+  const schema = z.object({
+    name: z.string().min(1, t('validation_name_required')).max(100),
+    email: z.string().email(t('validation_email_invalid')),
+    password: z
+      .string()
+      .min(8, t('validation_password_min'))
+      .regex(/[A-Z]/, t('validation_password_uppercase'))
+      .regex(/[0-9]/, t('validation_password_number')),
+    confirmPassword: z.string(),
+  }).refine((d) => d.password === d.confirmPassword, {
+    message: t('validation_passwords_mismatch'),
+    path: ['confirmPassword'],
+  });
+  type FormData = z.infer<typeof schema>;
 
   const {
     register,
@@ -39,8 +40,8 @@ export function RegisterPage() {
   async function onSubmit({ name, email, password }: FormData) {
     setApiError('');
     try {
-      const { token, user } = await authApi.register({ name, email, password });
-      setAuth(token, user);
+      const { token, refreshToken, user } = await authApi.register({ name, email, password });
+      setAuth(token, refreshToken, user);
       navigate('/');
     } catch (err) {
       setApiError(extractApiError(err));
@@ -52,38 +53,38 @@ export function RegisterPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🍽️</div>
-          <h1 className="text-2xl font-bold text-gray-900">Dinette</h1>
-          <p className="text-sm text-gray-500 mt-1">Créez votre carnet de recettes</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('app_name')}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t('register_subtitle')}</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input
-              label="Prénom / Nom"
+              label={t('register_name')}
               type="text"
               autoComplete="name"
-              placeholder="Votre nom"
+              placeholder={t('register_name_placeholder')}
               error={errors.name?.message}
               {...register('name')}
             />
             <Input
-              label="E-mail"
+              label={t('register_email')}
               type="email"
               autoComplete="email"
-              placeholder="vous@exemple.com"
+              placeholder={t('register_email_placeholder')}
               error={errors.email?.message}
               {...register('email')}
             />
             <Input
-              label="Mot de passe"
+              label={t('register_password')}
               type="password"
               autoComplete="new-password"
-              placeholder="Min. 8 car., 1 majuscule, 1 chiffre"
+              placeholder={t('register_password_placeholder')}
               error={errors.password?.message}
               {...register('password')}
             />
             <Input
-              label="Confirmer le mot de passe"
+              label={t('register_confirm_password')}
               type="password"
               autoComplete="new-password"
               placeholder="••••••••"
@@ -96,15 +97,15 @@ export function RegisterPage() {
             )}
 
             <Button type="submit" size="lg" loading={isSubmitting} className="w-full mt-2">
-              Créer mon compte
+              {t('register_submit')}
             </Button>
           </form>
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          Déjà un compte ?{' '}
+          {t('register_has_account')}{' '}
           <Link to="/login" className="text-brand-600 font-medium hover:underline">
-            Se connecter
+            {t('register_login_link')}
           </Link>
         </p>
       </div>

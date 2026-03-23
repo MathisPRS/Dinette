@@ -1,12 +1,13 @@
 import { Heart } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { RecipeSummary } from '@/types';
-import { CATEGORY_LABELS, formatTime, getImageUrl } from '@/utils';
+import { useCategoryLabels, formatTime, getImageUrl } from '@/utils';
 import { favoritesApi } from '@/api/favorites';
 import { useAuthStore } from '@/store/auth';
 import { useRecipeSheet } from '@/context/RecipeSheetContext';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useT } from '@/i18n';
 
 interface RecipeCardProps {
   recipe: RecipeSummary;
@@ -19,6 +20,8 @@ export function RecipeCard({ recipe, onFavoriteToggle }: RecipeCardProps) {
   const { openSheet } = useRecipeSheet();
   const [isFavorite, setIsFavorite] = useState(recipe.isFavorite);
   const [loading, setLoading] = useState(false);
+  const t = useT();
+  const categoryLabels = useCategoryLabels();
 
   const totalTime = (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0);
 
@@ -70,12 +73,12 @@ export function RecipeCard({ recipe, onFavoriteToggle }: RecipeCardProps) {
             'transition-colors active:scale-90',
             isFavorite ? 'text-red-500' : 'text-gray-400 hover:text-red-400'
           )}
-          aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+          aria-label={isFavorite ? t('recipe_remove_favorite') : t('recipe_add_favorite')}
         >
           <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} />
         </button>
         <span className="absolute bottom-2 left-2 bg-white/80 backdrop-blur-sm text-xs font-medium px-2 py-0.5 rounded-full text-gray-700">
-          {CATEGORY_LABELS[recipe.category]}
+          {categoryLabels[recipe.category]}
         </span>
       </div>
 

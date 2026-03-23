@@ -14,7 +14,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
       {/* Main content — offset by sidebar width on desktop */}
       <main className="lg:ml-60">
-        <div className="max-w-5xl mx-auto pb-20 lg:pb-8 lg:px-6 lg:pt-6">
+        <div className="max-w-5xl mx-auto pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-8 lg:px-6 lg:pt-6">
           {children}
         </div>
       </main>

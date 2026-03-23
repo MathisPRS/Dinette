@@ -8,18 +8,19 @@ import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { extractApiError } from '@/utils';
-
-const schema = z.object({
-  email: z.string().email('Adresse e-mail invalide'),
-  password: z.string().min(1, 'Mot de passe requis'),
-});
-
-type FormData = z.infer<typeof schema>;
+import { useT } from '@/i18n';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
   const [apiError, setApiError] = useState('');
+  const t = useT();
+
+  const schema = z.object({
+    email: z.string().email(t('validation_email_invalid')),
+    password: z.string().min(1, t('validation_password_required')),
+  });
+  type FormData = z.infer<typeof schema>;
 
   const {
     register,
@@ -30,8 +31,8 @@ export function LoginPage() {
   async function onSubmit(data: FormData) {
     setApiError('');
     try {
-      const { token, user } = await authApi.login(data);
-      setAuth(token, user);
+      const { token, refreshToken, user } = await authApi.login(data);
+      setAuth(token, refreshToken, user);
       navigate('/');
     } catch (err) {
       setApiError(extractApiError(err));
@@ -43,22 +44,22 @@ export function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🍽️</div>
-          <h1 className="text-2xl font-bold text-gray-900">Dinette</h1>
-          <p className="text-sm text-gray-500 mt-1">Connectez-vous à votre carnet de recettes</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('app_name')}</h1>
+          <p className="text-sm text-gray-500 mt-1">{t('login_subtitle')}</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input
-              label="E-mail"
+              label={t('login_email')}
               type="email"
               autoComplete="email"
-              placeholder="vous@exemple.com"
+              placeholder={t('login_email_placeholder')}
               error={errors.email?.message}
               {...register('email')}
             />
             <Input
-              label="Mot de passe"
+              label={t('login_password')}
               type="password"
               autoComplete="current-password"
               placeholder="••••••••"
@@ -71,15 +72,15 @@ export function LoginPage() {
             )}
 
             <Button type="submit" size="lg" loading={isSubmitting} className="w-full mt-2">
-              Se connecter
+              {t('login_submit')}
             </Button>
           </form>
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          Pas encore de compte ?{' '}
+          {t('login_no_account')}{' '}
           <Link to="/register" className="text-brand-600 font-medium hover:underline">
-            Créer un compte
+            {t('login_create_account')}
           </Link>
         </p>
       </div>

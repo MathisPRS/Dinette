@@ -14,6 +14,7 @@ export interface RegisterPayload {
 
 export interface AuthResponse {
   token: string;
+  refreshToken: string;
   user: User;
 }
 
@@ -24,5 +25,16 @@ export const authApi = {
   login: (data: LoginPayload) =>
     api.post<AuthResponse>('/auth/login', data).then((r) => r.data),
 
+  refresh: (refreshToken: string) =>
+    api
+      .post<AuthResponse>('/auth/refresh', { refreshToken })
+      .then((r) => r.data),
+
+  logout: (refreshToken: string) =>
+    api.post('/auth/logout', { refreshToken }),
+
   me: () => api.get<{ user: User }>('/auth/me').then((r) => r.data.user),
+
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.put('/auth/password', { currentPassword, newPassword }),
 };

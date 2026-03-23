@@ -5,15 +5,18 @@ import { recipeApi } from '@/api/recipes';
 import { favoritesApi } from '@/api/favorites';
 import { useAuthStore } from '@/store/auth';
 import type { Recipe } from '@/types';
-import { CATEGORY_LABELS, formatTime, getImageUrl, extractApiError } from '@/utils';
+import { useCategoryLabels, formatTime, getImageUrl, extractApiError } from '@/utils';
 import { Spinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
 import { clsx } from 'clsx';
+import { useT } from '@/i18n';
 
 export function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
+  const t = useT();
+  const categoryLabels = useCategoryLabels();
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,7 +33,7 @@ export function RecipeDetailPage() {
         setRecipe(r);
         setIsFavorite(r.isFavorite);
       })
-      .catch(() => setError('Recipe not found'))
+      .catch(() => setError(t('recipe_not_found')))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -51,7 +54,7 @@ export function RecipeDetailPage() {
   }
 
   async function handleDelete() {
-    if (!confirm('Delete this recipe? This cannot be undone.')) return;
+    if (!confirm(t('recipe_delete_confirm'))) return;
     setDeleting(true);
     try {
       await recipeApi.delete(id!);
@@ -73,13 +76,15 @@ export function RecipeDetailPage() {
   if (error || !recipe) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 lg:ml-60">
-        <p className="text-gray-500">{error || 'Something went wrong'}</p>
-        <Button onClick={() => navigate('/')}>Go home</Button>
+        <p className="text-gray-500">{error || t('recipe_error_generic')}</p>
+        <Button onClick={() => navigate('/')}>{t('recipe_go_home')}</Button>
       </div>
     );
   }
 
   const isOwner = user?.id === recipe.author.id;
+  // Group members can also edit/delete
+  const canEdit = isOwner || (!!recipe.groupId && !!user);
   const totalTime = (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0);
 
   return (
@@ -93,7 +98,7 @@ export function RecipeDetailPage() {
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
           >
             <ArrowLeft size={16} />
-            Back
+            {t('recipe_back')}
           </button>
         </div>
 
@@ -136,7 +141,7 @@ export function RecipeDetailPage() {
 
             {/* Ingredients (shown in left column on desktop) */}
             <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mt-4">
-              <h2 className="font-semibold text-gray-900 mb-3">Ingredients</h2>
+              <h2 className="font-semibold text-gray-900 mb-3">{t('recipe_ingredients_title')}</h2>
               <ul className="flex flex-col gap-2">
                 {recipe.ingredients.map((ing) => (
                   <li key={ing.id} className="flex items-baseline gap-2 text-sm">
@@ -162,7 +167,7 @@ export function RecipeDetailPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
                     <span className="text-xs font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">
-                      {CATEGORY_LABELS[recipe.category]}
+                      {categoryLabels[recipe.category]}
                     </span>
                     <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mt-2 leading-tight">{recipe.title}</h1>
                     {recipe.description && (
@@ -188,24 +193,24 @@ export function RecipeDetailPage() {
                 <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
                   <div className="flex items-center gap-1">
                     <Users size={14} />
-                    <span>{recipe.servings} servings</span>
+                    <span>{t('recipe_servings', { count: recipe.servings })}</span>
                   </div>
                   {recipe.prepTime && (
                     <div className="flex items-center gap-1">
                       <Clock size={14} />
-                      <span>Prep {formatTime(recipe.prepTime)}</span>
+                      <span>{t('recipe_prep')} {formatTime(recipe.prepTime)}</span>
                     </div>
                   )}
                   {recipe.cookTime && (
                     <div className="flex items-center gap-1">
                       <Clock size={14} />
-                      <span>Cook {formatTime(recipe.cookTime)}</span>
+                      <span>{t('recipe_cook')} {formatTime(recipe.cookTime)}</span>
                     </div>
                   )}
                   {totalTime > 0 && (
                     <div className="flex items-center gap-1 font-medium text-brand-600">
                       <Clock size={14} />
-                      <span>{formatTime(totalTime)} total</span>
+                      <span>{formatTime(totalTime)} {t('recipe_total').toLowerCase()}</span>
                     </div>
                   )}
                 </div>
@@ -225,7 +230,7 @@ export function RecipeDetailPage() {
                 )}
 
                 {/* Owner actions */}
-                {isOwner && (
+                {canEdit && (
                   <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
                     <Button
                       variant="secondary"
@@ -234,7 +239,7 @@ export function RecipeDetailPage() {
                       className="flex-1"
                     >
                       <Pencil size={14} />
-                      Edit
+                      {t('recipe_edit')}
                     </Button>
                     <Button
                       variant="danger"
@@ -244,7 +249,7 @@ export function RecipeDetailPage() {
                       className="flex-1"
                     >
                       <Trash2 size={14} />
-                      Delete
+                      {t('recipe_delete')}
                     </Button>
                   </div>
                 )}
@@ -252,7 +257,7 @@ export function RecipeDetailPage() {
 
               {/* Ingredients (mobile only — shown in right column stacked view) */}
               <div className="lg:hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
-                <h2 className="font-semibold text-gray-900 mb-3">Ingredients</h2>
+                <h2 className="font-semibold text-gray-900 mb-3">{t('recipe_ingredients_title')}</h2>
                 <ul className="flex flex-col gap-2">
                   {recipe.ingredients.map((ing) => (
                     <li key={ing.id} className="flex items-baseline gap-2 text-sm">
@@ -270,7 +275,7 @@ export function RecipeDetailPage() {
 
               {/* Steps */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-                <h2 className="font-semibold text-gray-900 mb-3">Instructions</h2>
+                <h2 className="font-semibold text-gray-900 mb-3">{t('recipe_instructions_title')}</h2>
                 <ol className="flex flex-col gap-4">
                   {recipe.steps.map((step, i) => (
                     <li key={step.id} className="flex gap-3">
