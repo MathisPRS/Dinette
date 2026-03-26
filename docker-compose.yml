@@ -53,7 +53,7 @@ services:
     volumes:
       - uploads_data:/app/backend/uploads
     ports:
-      - "80:80"
+      - "8041:80"
     depends_on:
       db:
         condition: service_healthy
