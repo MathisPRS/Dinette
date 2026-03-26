@@ -24,11 +24,28 @@ model User {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  recipes       Recipe[]
-  favorites     Favorite[]
-  refreshTokens RefreshToken[]
-  groupMemberships GroupMember[]
-  ownedGroups   Group[]
+  recipes              Recipe[]
+  favorites            Favorite[]
+  refreshTokens        RefreshToken[]
+  groupMemberships     GroupMember[]
+  ownedGroups          Group[]
+  webAuthnCredentials  WebAuthnCredential[]
+}
+
+model WebAuthnCredential {
+  id           String   @id @default(cuid())
+  userId       String
+  credentialId String   @unique
+  publicKey    Bytes
+  counter      Int      @default(0)
+  deviceType   String   @default("singleDevice")
+  backedUp     Boolean  @default(false)
+  transports   String[]
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Recipe {

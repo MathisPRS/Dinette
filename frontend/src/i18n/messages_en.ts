@@ -221,6 +221,25 @@ export const en: Messages = {
   // Errors
   error_generic: 'An error occurred',
 
+  // WebAuthn / Biometrics
+  webauthn_login_button: 'Sign in with Face ID',
+  webauthn_login_error: 'Biometric login failed',
+  webauthn_register_title: 'Quick sign-in',
+  webauthn_register_desc: 'Enable Face ID to sign in instantly on your next visits.',
+  webauthn_register_enable: 'Enable Face ID',
+  webauthn_register_skip: 'Not now',
+  webauthn_register_success: 'Face ID enabled',
+  webauthn_register_error: 'Could not enable Face ID',
+  webauthn_profile_section: 'Biometric sign-in',
+  webauthn_profile_enabled: 'Face ID enabled',
+  webauthn_profile_enabled_desc: 'You can sign in with Face ID on this device.',
+  webauthn_profile_disable: 'Disable',
+  webauthn_profile_disabled: 'Face ID not set up',
+  webauthn_profile_disabled_desc: 'Enable Face ID to sign in without a password.',
+  webauthn_profile_enable: 'Enable',
+  webauthn_profile_disable_success: 'Face ID disabled',
+  webauthn_not_available: 'Face ID is not available on this device',
+
   // Confirm modals
   confirm_cancel: 'Cancel',
   confirm_delete_recipe_title: 'Delete recipe',

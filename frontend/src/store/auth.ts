@@ -7,8 +7,10 @@ interface AuthState {
   refreshToken: string | null;
   user: User | null;
   isAuthenticated: boolean;
+  webAuthnRegistered: boolean;
   setAuth: (token: string, refreshToken: string, user: User) => void;
   setToken: (token: string) => void;
+  setWebAuthnRegistered: (value: boolean) => void;
   logout: () => void;
 }
 
@@ -19,10 +21,13 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       user: null,
       isAuthenticated: false,
+      webAuthnRegistered: false,
       setAuth: (token, refreshToken, user) =>
         set({ token, refreshToken, user, isAuthenticated: true }),
       setToken: (token) => set({ token }),
-      logout: () => set({ token: null, refreshToken: null, user: null, isAuthenticated: false }),
+      setWebAuthnRegistered: (value) => set({ webAuthnRegistered: value }),
+      logout: () =>
+        set({ token: null, refreshToken: null, user: null, isAuthenticated: false }),
     }),
     {
       name: 'dinette-auth',
@@ -30,6 +35,7 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         refreshToken: state.refreshToken,
         user: state.user,
+        webAuthnRegistered: state.webAuthnRegistered,
       }),
       onRehydrateStorage: () => (state) => {
         if (state?.token) {

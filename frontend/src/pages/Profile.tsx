@@ -1,17 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { LogOut, User, Globe, Lock, Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
+import { LogOut, User, Globe, Lock, Eye, EyeOff, ChevronDown, ChevronUp, Fingerprint } from 'lucide-react';
 import { useT, useI18nStore } from '@/i18n';
 import type { Locale } from '@/i18n';
 import { clsx } from 'clsx';
 import { authApi } from '@/api/auth';
+import { webAuthnApi, isBiometricAvailable } from '@/api/webauthn';
 import { extractApiError } from '@/utils';
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { user, logout, webAuthnRegistered, setWebAuthnRegistered } = useAuthStore();
   const t = useT();
   const { locale, setLocale } = useI18nStore();
 
@@ -26,6 +27,14 @@ export function ProfilePage() {
   const [pwLoading, setPwLoading] = useState(false);
   const [pwError, setPwError] = useState('');
   const [pwSuccess, setPwSuccess] = useState(false);
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
+  const [biometricError, setBiometricError] = useState('');
+  const [biometricSuccess, setBiometricSuccess] = useState('');
+
+  useEffect(() => {
+    isBiometricAvailable().then(setBiometricAvailable);
+  }, []);
 
   function handleLogout() {
     logout();
@@ -79,6 +88,36 @@ export function ProfilePage() {
     setCurrentPw('');
     setNewPw('');
     setConfirmPw('');
+  }
+
+  async function handleEnableBiometric() {
+    setBiometricError('');
+    setBiometricSuccess('');
+    setBiometricLoading(true);
+    try {
+      await webAuthnApi.register();
+      setWebAuthnRegistered(true);
+      setBiometricSuccess(t('webauthn_register_success'));
+    } catch (err) {
+      setBiometricError(extractApiError(err) || t('webauthn_register_error'));
+    } finally {
+      setBiometricLoading(false);
+    }
+  }
+
+  async function handleDisableBiometric() {
+    setBiometricError('');
+    setBiometricSuccess('');
+    setBiometricLoading(true);
+    try {
+      await webAuthnApi.deleteCredential();
+      setWebAuthnRegistered(false);
+      setBiometricSuccess(t('webauthn_profile_disable_success'));
+    } catch (err) {
+      setBiometricError(extractApiError(err) || t('error_generic'));
+    } finally {
+      setBiometricLoading(false);
+    }
   }
 
   if (!user) {
@@ -241,6 +280,54 @@ export function ProfilePage() {
               </div>
             </form>
           )}
+        </div>
+
+        {/* Biometric login */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
+              <Fingerprint size={20} className="text-brand-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-gray-900 text-sm mb-1">{t('webauthn_profile_section')}</p>
+              {!biometricAvailable ? (
+                <p className="text-sm text-gray-500">{t('webauthn_not_available')}</p>
+              ) : webAuthnRegistered ? (
+                <>
+                  <p className="text-sm text-gray-700">{t('webauthn_profile_enabled')}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('webauthn_profile_enabled_desc')}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-700">{t('webauthn_profile_disabled')}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('webauthn_profile_disabled_desc')}</p>
+                </>
+              )}
+
+              {biometricError && <p className="text-xs text-red-500 mt-3">{biometricError}</p>}
+              {biometricSuccess && <p className="text-xs text-green-600 mt-3">{biometricSuccess}</p>}
+
+              {biometricAvailable && (
+                <button
+                  onClick={webAuthnRegistered ? handleDisableBiometric : handleEnableBiometric}
+                  disabled={biometricLoading}
+                  className={clsx(
+                    'mt-4 px-4 py-2 rounded-xl text-sm font-medium transition-colors',
+                    webAuthnRegistered
+                      ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                      : 'bg-brand-600 text-white hover:bg-brand-700',
+                    biometricLoading && 'opacity-50'
+                  )}
+                >
+                  {biometricLoading
+                    ? '...'
+                    : webAuthnRegistered
+                      ? t('webauthn_profile_disable')
+                      : t('webauthn_profile_enable')}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Logout */}

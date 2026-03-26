@@ -219,6 +219,25 @@ export const fr = {
   // Errors
   error_generic: 'Une erreur est survenue',
 
+  // WebAuthn / Biometrics
+  webauthn_login_button: 'Se connecter avec Face ID',
+  webauthn_login_error: 'Connexion biométrique échouée',
+  webauthn_register_title: 'Connexion rapide',
+  webauthn_register_desc: 'Activez Face ID pour vous connecter en un clin d\'œil lors de vos prochaines visites.',
+  webauthn_register_enable: 'Activer Face ID',
+  webauthn_register_skip: 'Pas maintenant',
+  webauthn_register_success: 'Face ID activé avec succès',
+  webauthn_register_error: 'Impossible d\'activer Face ID',
+  webauthn_profile_section: 'Connexion biométrique',
+  webauthn_profile_enabled: 'Face ID activé',
+  webauthn_profile_enabled_desc: 'Vous pouvez vous connecter avec Face ID sur cet appareil.',
+  webauthn_profile_disable: 'Désactiver',
+  webauthn_profile_disabled: 'Face ID non activé',
+  webauthn_profile_disabled_desc: 'Activez Face ID pour vous connecter sans mot de passe.',
+  webauthn_profile_enable: 'Activer',
+  webauthn_profile_disable_success: 'Face ID désactivé',
+  webauthn_not_available: 'Face ID non disponible sur cet appareil',
+
   // Confirm modals
   confirm_cancel: 'Annuler',
   confirm_delete_recipe_title: 'Supprimer la recette',
