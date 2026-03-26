@@ -1,11 +1,21 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
+
 const prisma = new PrismaClient();
 
-const SEED_USER_EMAIL = 'chef@dinette.app';
-const SEED_USER_PASSWORD = 'Secret123';
-const SEED_USER_NAME = 'Chef Marie';
+function parseBool(value: string | undefined, defaultValue: boolean): boolean {
+  if (value === undefined) return defaultValue;
+  return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
+}
+
+const isProduction = process.env.NODE_ENV === 'production';
+const shouldSeedTestUser = parseBool(process.env.SEED_TEST_USER, !isProduction);
+const shouldSeedDemoRecipes = parseBool(process.env.SEED_DEMO_RECIPES, !isProduction);
+
+const SEED_USER_EMAIL = process.env.SEED_USER_EMAIL ?? 'chef@dinette.app';
+const SEED_USER_PASSWORD = process.env.SEED_USER_PASSWORD ?? 'Tprzo.40!!';
+const SEED_USER_NAME = process.env.SEED_USER_NAME ?? 'Chef Marie';
 
 const recipes = [
   {
@@ -297,6 +307,11 @@ const recipes = [
 async function main() {
   console.log('🌱 Seeding database...');
 
+  if (!shouldSeedTestUser) {
+    console.log('⏭️  Skipping test user seed (SEED_TEST_USER disabled).');
+    return;
+  }
+
   // Upsert seed user
   const passwordHash = await bcrypt.hash(SEED_USER_PASSWORD, 12);
   const user = await prisma.user.upsert({
@@ -309,6 +324,11 @@ async function main() {
     },
   });
   console.log(`✅ Seed user: ${user.email}`);
+
+  if (!shouldSeedDemoRecipes) {
+    console.log('⏭️  Skipping demo recipes seed (SEED_DEMO_RECIPES disabled).');
+    return;
+  }
 
   // Create recipes
   let created = 0;

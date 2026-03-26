@@ -35,16 +35,7 @@ app.use(
 // CORS
 app.use(
   cors({
-    origin: [
-      config.frontendUrl,
-      'http://localhost',
-      'http://localhost:80',
-      'http://localhost:5173',
-      'http://127.0.0.1',
-      'http://127.0.0.1:80',
-      'http://192.168.1.9',
-      'http://192.168.1.9:80',
-    ],
+    origin: config.cors.origins,
     credentials: true,
   })
 );
