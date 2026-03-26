@@ -8,6 +8,7 @@ import type { Recipe } from '@/types';
 import { useCategoryLabels, formatTime, getImageUrl, extractApiError } from '@/utils';
 import { Spinner } from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/Button';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { clsx } from 'clsx';
 import { useT } from '@/i18n';
 
@@ -24,6 +25,8 @@ export function RecipeDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     if (!id) return;
@@ -54,13 +57,15 @@ export function RecipeDetailPage() {
   }
 
   async function handleDelete() {
-    if (!confirm(t('recipe_delete_confirm'))) return;
     setDeleting(true);
+    setDeleteError('');
     try {
       await recipeApi.delete(id!);
+      setConfirmOpen(false);
       navigate('/');
     } catch (err) {
-      alert(extractApiError(err));
+      setDeleteError(extractApiError(err));
+      setConfirmOpen(false);
       setDeleting(false);
     }
   }
@@ -88,6 +93,7 @@ export function RecipeDetailPage() {
   const totalTime = (recipe.prepTime ?? 0) + (recipe.cookTime ?? 0);
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 lg:ml-60">
       <div className="max-w-4xl mx-auto pb-20 lg:pb-8 lg:px-6 lg:pt-6">
 
@@ -244,7 +250,7 @@ export function RecipeDetailPage() {
                     <Button
                       variant="danger"
                       size="sm"
-                      onClick={handleDelete}
+                      onClick={() => setConfirmOpen(true)}
                       loading={deleting}
                       className="flex-1"
                     >
@@ -254,6 +260,11 @@ export function RecipeDetailPage() {
                   </div>
                 )}
               </div>
+
+              {/* Delete error */}
+              {deleteError && (
+                <p className="text-sm text-red-600 text-center mt-2">{deleteError}</p>
+              )}
 
               {/* Ingredients (mobile only — shown in right column stacked view) */}
               <div className="lg:hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
@@ -293,5 +304,18 @@ export function RecipeDetailPage() {
         </div>
       </div>
     </div>
+
+    <ConfirmModal
+      open={confirmOpen}
+      title={t('confirm_delete_recipe_title')}
+      message={t('confirm_delete_recipe_message')}
+      confirmLabel={t('confirm_delete_recipe_confirm')}
+      cancelLabel={t('confirm_cancel')}
+      variant="danger"
+      loading={deleting}
+      onConfirm={handleDelete}
+      onCancel={() => setConfirmOpen(false)}
+    />
+  </>
   );
 }

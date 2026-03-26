@@ -10,6 +10,7 @@ import { groupsApi } from '@/api/groups';
 import { recipeApi } from '@/api/recipes';
 import { extractApiError } from '@/utils';
 import { RecipeCard } from '@/components/recipe/RecipeCard';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import type { Group, RecipeSummary } from '@/types';
 
 export function GroupDetailPage() {
@@ -26,6 +27,9 @@ export function GroupDetailPage() {
   const [copied, setCopied] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmLeave, setConfirmLeave] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [actionError, setActionError] = useState('');
 
   useEffect(() => {
     if (!id) return;
@@ -54,25 +58,31 @@ export function GroupDetailPage() {
   }
 
   async function handleLeave() {
-    if (!group || !confirm(t('groups_leave_confirm'))) return;
+    if (!group) return;
     setLeaving(true);
+    setActionError('');
     try {
       await groupsApi.leave(group.id);
+      setConfirmLeave(false);
       navigate('/groups');
     } catch (err) {
-      alert(extractApiError(err));
+      setActionError(extractApiError(err));
+      setConfirmLeave(false);
       setLeaving(false);
     }
   }
 
   async function handleDelete() {
-    if (!group || !confirm(t('groups_leave_confirm'))) return;
+    if (!group) return;
     setDeleting(true);
+    setActionError('');
     try {
       await groupsApi.delete(group.id);
+      setConfirmDelete(false);
       navigate('/groups');
     } catch (err) {
-      alert(extractApiError(err));
+      setActionError(extractApiError(err));
+      setConfirmDelete(false);
       setDeleting(false);
     }
   }
@@ -125,7 +135,7 @@ export function GroupDetailPage() {
             </div>
             {isOwner ? (
               <button
-                onClick={handleDelete}
+                onClick={() => setConfirmDelete(true)}
                 disabled={deleting}
                 className="p-2 rounded-xl text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors"
                 title={t('recipe_delete')}
@@ -134,7 +144,7 @@ export function GroupDetailPage() {
               </button>
             ) : (
               <button
-                onClick={handleLeave}
+                onClick={() => setConfirmLeave(true)}
                 disabled={leaving}
                 className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
                 title={t('groups_leave')}
@@ -225,7 +235,35 @@ export function GroupDetailPage() {
             </div>
           )}
         </div>
+
+        {/* Action error */}
+        {actionError && (
+          <p className="text-sm text-red-600 text-center mt-2 mb-2">{actionError}</p>
+        )}
       </div>
+
+      <ConfirmModal
+        open={confirmLeave}
+        title={t('confirm_leave_group_title')}
+        message={t('groups_leave_confirm')}
+        confirmLabel={t('groups_leave')}
+        cancelLabel={t('confirm_cancel')}
+        variant="danger"
+        loading={leaving}
+        onConfirm={handleLeave}
+        onCancel={() => setConfirmLeave(false)}
+      />
+      <ConfirmModal
+        open={confirmDelete}
+        title={t('confirm_delete_group_title')}
+        message={t('confirm_delete_group_message')}
+        confirmLabel={t('confirm_delete_group_confirm')}
+        cancelLabel={t('confirm_cancel')}
+        variant="danger"
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </AppLayout>
   );
 }

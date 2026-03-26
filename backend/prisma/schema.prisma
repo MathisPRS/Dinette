@@ -137,3 +137,9 @@ model GroupMember {
 
   @@id([userId, groupId])
 }
+
+model MealIngredient {
+  id     Int    @id @default(autoincrement())
+  nameEn String @unique
+  nameFr String
+}

@@ -141,6 +141,34 @@ export const en: Messages = {
   suggest_loading: 'Searching...',
   suggest_view_recipe: 'View recipe',
 
+  // Suggest external
+  suggest_ext_title: 'Discover Recipes',
+  suggest_ext_subtitle: 'Search by ingredients across thousands of recipes from around the world',
+  suggest_ext_ingredient_placeholder: 'e.g. chicken, tomato, garlic…',
+  suggest_ext_ingredient_label: 'Main ingredient',
+  suggest_ext_category_label: 'Category',
+  suggest_ext_area_label: 'Cuisine',
+  suggest_ext_search_btn: 'Search',
+  suggest_ext_searching: 'Searching…',
+  suggest_ext_no_results: 'No recipes found. Try a different ingredient.',
+  suggest_ext_results_count: '{count} recipe(s) found',
+  suggest_ext_all_categories: 'All categories',
+  suggest_ext_all_areas: 'All cuisines',
+  suggest_ext_import_btn: 'Import into my recipes',
+  suggest_ext_importing: 'Importing…',
+  suggest_ext_imported: 'Recipe imported!',
+  suggest_ext_import_error: 'Import failed',
+  suggest_ext_view_source: 'View source',
+  suggest_ext_watch_youtube: 'Watch on YouTube',
+  suggest_ext_ingredients_title: 'Ingredients',
+  suggest_ext_steps_title: 'Instructions',
+  suggest_ext_close: 'Close',
+  suggest_ext_area_label_badge: 'Cuisine',
+  suggest_ext_hint: 'Type an ingredient to get started',
+  suggest_ext_ingredient_loading: 'Loading ingredients…',
+  suggest_ext_ingredient_no_match: 'No ingredient found',
+  suggest_ext_translating: 'Translating…',
+
   // Profile
   profile_title: 'Profile',
   profile_logout: 'Sign out',
@@ -192,6 +220,16 @@ export const en: Messages = {
 
   // Errors
   error_generic: 'An error occurred',
+
+  // Confirm modals
+  confirm_cancel: 'Cancel',
+  confirm_delete_recipe_title: 'Delete recipe',
+  confirm_delete_recipe_message: 'This cannot be undone. The recipe will be permanently deleted.',
+  confirm_delete_recipe_confirm: 'Delete',
+  confirm_leave_group_title: 'Leave group',
+  confirm_delete_group_title: 'Delete group',
+  confirm_delete_group_message: 'This cannot be undone. The group and all its data will be permanently deleted.',
+  confirm_delete_group_confirm: 'Delete',
 
   // Stats labels in sheet
   stat_prep: 'Prep',

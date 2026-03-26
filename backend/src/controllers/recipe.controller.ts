@@ -34,6 +34,7 @@ const stepSchema = z.object({
 const recipeBodySchema = z.object({
   title: z.string().min(1).max(200).trim(),
   description: z.string().max(2000).trim().optional(),
+  coverImage: z.string().url().optional().nullable(),
   category: z.nativeEnum(Category),
   servings: z.number().int().min(1).max(100).default(4),
   prepTime: z.number().int().min(0).optional(),

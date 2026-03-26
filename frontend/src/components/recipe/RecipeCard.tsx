@@ -11,10 +11,11 @@ import { useT } from '@/i18n';
 
 interface RecipeCardProps {
   recipe: RecipeSummary;
+  leaving?: boolean;
   onFavoriteToggle?: (id: string, isFavorite: boolean) => void;
 }
 
-export function RecipeCard({ recipe, onFavoriteToggle }: RecipeCardProps) {
+export function RecipeCard({ recipe, leaving = false, onFavoriteToggle }: RecipeCardProps) {
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { openSheet } = useRecipeSheet();
@@ -49,7 +50,10 @@ export function RecipeCard({ recipe, onFavoriteToggle }: RecipeCardProps) {
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150"
+      className={clsx(
+        'bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-150',
+        leaving && 'animate-card-leave pointer-events-none'
+      )}
       onClick={() => openSheet(recipe.id)}
     >
       {/* Image */}

@@ -12,12 +12,13 @@ import { useRecipeSheet } from '@/context/RecipeSheetContext';
 import type { Recipe } from '@/types';
 import { useCategoryLabels, formatTime, getImageUrl, extractApiError } from '@/utils';
 import { Spinner } from '@/components/ui/Spinner';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useT } from '@/i18n';
 
 type Tab = 'ingredients' | 'steps';
 
 export function RecipeSheet() {
-  const { openRecipeId, closeSheet } = useRecipeSheet();
+  const { openRecipeId, closeSheet, notifyDeleted } = useRecipeSheet();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
   const t = useT();
@@ -29,6 +30,8 @@ export function RecipeSheet() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const [tab, setTab] = useState<Tab>('ingredients');
 
   // Track checked ingredients (UI only)
@@ -44,6 +47,9 @@ export function RecipeSheet() {
       setError('');
       setTab('ingredients');
       setCheckedIngredients(new Set());
+      setDeleting(false);
+      setConfirmOpen(false);
+      setDeleteError('');
       return;
     }
     setLoading(true);
@@ -93,14 +99,16 @@ export function RecipeSheet() {
   }
 
   async function handleDelete() {
-    if (!confirm(t('recipe_delete_confirm'))) return;
     setDeleting(true);
+    setDeleteError('');
     try {
       await recipeApi.delete(openRecipeId!);
+      setConfirmOpen(false);
+      notifyDeleted(openRecipeId!);
       closeSheet();
-      navigate('/');
     } catch (err) {
-      alert(extractApiError(err));
+      setDeleteError(extractApiError(err));
+      setConfirmOpen(false);
       setDeleting(false);
     }
   }
@@ -228,7 +236,7 @@ export function RecipeSheet() {
                         <Pencil size={16} />
                       </button>
                       <button
-                        onClick={handleDelete}
+                        onClick={() => setConfirmOpen(true)}
                         disabled={deleting}
                         className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-red-500 transition-colors"
                         aria-label={t('recipe_delete')}
@@ -385,11 +393,28 @@ export function RecipeSheet() {
                 <p className="mt-6 text-xs text-gray-400 text-center">
                   {t('recipe_author', { name: recipe.author.name })}
                 </p>
+
+                {/* Delete error */}
+                {deleteError && (
+                  <p className="mt-3 text-xs text-red-600 text-center">{deleteError}</p>
+                )}
               </div>
             </>
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        open={confirmOpen}
+        title={t('confirm_delete_recipe_title')}
+        message={t('confirm_delete_recipe_message')}
+        confirmLabel={t('confirm_delete_recipe_confirm')}
+        cancelLabel={t('confirm_cancel')}
+        variant="danger"
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </>
   );
 }

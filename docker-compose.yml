@@ -14,10 +14,23 @@ services:
       timeout: 5s
       retries: 5
 
-  backend:
+  translate:
+    image: libretranslate/libretranslate:latest
+    restart: unless-stopped
+    environment:
+      LT_LOAD_ONLY: "en,fr"
+      LT_DISABLE_WEB_UI: "true"
+      LT_DISABLE_FILES_TRANSLATION: "true"
+      LT_ARGOS_PACKAGES_DIR: /app/db/argos-translate/packages
+    volumes:
+      - libretranslate_data:/app/db
+
+  app:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
     restart: unless-stopped
     environment:
       DATABASE_URL: ${DATABASE_URL}
@@ -28,26 +41,18 @@ services:
       UPLOAD_DIR: ${UPLOAD_DIR}
       MAX_FILE_SIZE_MB: ${MAX_FILE_SIZE_MB}
       FRONTEND_URL: ${FRONTEND_URL}
+      LIBRETRANSLATE_URL: http://translate:5000
     volumes:
-      - uploads_data:/app/uploads
-    depends_on:
-      db:
-        condition: service_healthy
-    expose:
-      - "${PORT}"
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL}
-    restart: unless-stopped
+      - uploads_data:/app/backend/uploads
     ports:
       - "80:80"
     depends_on:
-      - backend
+      db:
+        condition: service_healthy
+      translate:
+        condition: service_started
 
 volumes:
   postgres_data:
   uploads_data:
+  libretranslate_data:

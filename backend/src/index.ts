@@ -12,6 +12,7 @@ import recipeRoutes from './routes/recipe.routes.js';
 import favoriteRoutes from './routes/favorite.routes.js';
 import tagRoutes from './routes/tag.routes.js';
 import groupRoutes from './routes/group.routes.js';
+import suggestRoutes from './routes/suggest.routes.js';
 
 const app = express();
 
@@ -34,7 +35,16 @@ app.use(
 // CORS
 app.use(
   cors({
-    origin: [config.frontendUrl, 'http://192.168.1.9', 'http://192.168.1.9:80'],
+    origin: [
+      config.frontendUrl,
+      'http://localhost',
+      'http://localhost:80',
+      'http://localhost:5173',
+      'http://127.0.0.1',
+      'http://127.0.0.1:80',
+      'http://192.168.1.9',
+      'http://192.168.1.9:80',
+    ],
     credentials: true,
   })
 );
@@ -66,6 +76,7 @@ app.use('/api/recipes', recipeRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/groups', groupRoutes);
+app.use('/api/suggest', suggestRoutes);
 
 // 404
 app.use((_req, res) => {

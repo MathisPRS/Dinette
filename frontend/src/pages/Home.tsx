@@ -10,6 +10,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Button } from '@/components/ui/Button';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { useRecipeSheet } from '@/context/RecipeSheetContext';
 import { useT } from '@/i18n';
 
 const LIMIT = 20;
@@ -17,6 +18,27 @@ const LIMIT = 20;
 export function HomePage() {
   const navigate = useNavigate();
   const t = useT();
+  const { onDeleted } = useRecipeSheet();
+
+  const [leavingIds, setLeavingIds] = useState<Set<string>>(new Set());
+
+  // Remove deleted recipe from list with a short exit animation
+  useEffect(() => {
+    return onDeleted((id) => {
+      // 1. Mark as leaving → triggers CSS animation
+      setLeavingIds((prev) => new Set(prev).add(id));
+      // 2. After animation ends, remove from list
+      setTimeout(() => {
+        setRecipes((prev) => prev.filter((r) => r.id !== id));
+        setTotal((prev) => Math.max(0, prev - 1));
+        setLeavingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }, 400);
+    });
+  }, [onDeleted]);
 
   const [recipes, setRecipes] = useState<RecipeSummary[]>([]);
   const [total, setTotal] = useState(0);
@@ -160,6 +182,7 @@ export function HomePage() {
                 <RecipeCard
                   key={recipe.id}
                   recipe={recipe}
+                  leaving={leavingIds.has(recipe.id)}
                   onFavoriteToggle={handleFavoriteToggle}
                 />
               ))}

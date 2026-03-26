@@ -23,6 +23,15 @@ export default {
       screens: {
         xs: '375px',
       },
+      keyframes: {
+        'card-leave': {
+          '0%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+          '100%': { opacity: '0', transform: 'translateY(16px) scale(0.95)' },
+        },
+      },
+      animation: {
+        'card-leave': 'card-leave 0.35s ease-in forwards',
+      },
     },
   },
   plugins: [],

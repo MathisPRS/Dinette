@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/store/auth';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? '/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
   timeout: 15000,
 });
 
@@ -54,7 +54,7 @@ api.interceptors.response.use(
       try {
         // Call the refresh endpoint directly (not through the intercepted `api` instance)
         const res = await axios.post<{ token: string; refreshToken: string }>(
-          `${import.meta.env.VITE_API_URL ?? '/api'}/auth/refresh`,
+          `${import.meta.env.VITE_API_URL || '/api'}/auth/refresh`,
           { refreshToken }
         );
         const { token: newToken, refreshToken: newRefreshToken } = res.data;

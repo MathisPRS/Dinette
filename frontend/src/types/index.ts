@@ -70,6 +70,7 @@ export interface RecipeFilters {
 export interface RecipeFormData {
   title: string;
   description?: string;
+  coverImage?: string | null;
   category: Category;
   servings: number;
   prepTime?: number;
@@ -101,4 +102,25 @@ export interface Group {
   members: GroupMember[];
   _count: { recipes: number };
   joinedAt?: string;
+}
+
+// ── External recipe (TheMealDB) ──────────────────────────────────────────────
+
+export interface ExternalIngredient {
+  name: string;
+  measure: string;
+}
+
+export interface ExternalRecipe {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+  area: string;
+  instructions: string;
+  steps: string[];
+  ingredients: ExternalIngredient[];
+  tags: string[];
+  youtube: string | null;
+  source: string | null;
 }

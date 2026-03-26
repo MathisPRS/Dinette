@@ -139,6 +139,34 @@ export const fr = {
   suggest_loading: 'Recherche en cours...',
   suggest_view_recipe: 'Voir la recette',
 
+  // Suggest external
+  suggest_ext_title: 'Découvrir des recettes',
+  suggest_ext_subtitle: 'Recherchez par ingrédients dans des milliers de recettes du monde entier',
+  suggest_ext_ingredient_placeholder: 'Ex. chicken, tomato, garlic…',
+  suggest_ext_ingredient_label: 'Ingrédient principal',
+  suggest_ext_category_label: 'Catégorie',
+  suggest_ext_area_label: 'Cuisine',
+  suggest_ext_search_btn: 'Rechercher',
+  suggest_ext_searching: 'Recherche en cours…',
+  suggest_ext_no_results: 'Aucune recette trouvée. Essayez un autre ingrédient.',
+  suggest_ext_results_count: '{count} recette(s) trouvée(s)',
+  suggest_ext_all_categories: 'Toutes les catégories',
+  suggest_ext_all_areas: 'Toutes les cuisines',
+  suggest_ext_import_btn: 'Importer dans mes recettes',
+  suggest_ext_importing: 'Import en cours…',
+  suggest_ext_imported: 'Recette importée !',
+  suggest_ext_import_error: "Erreur lors de l'import",
+  suggest_ext_view_source: 'Voir la source',
+  suggest_ext_watch_youtube: 'Voir sur YouTube',
+  suggest_ext_ingredients_title: 'Ingrédients',
+  suggest_ext_steps_title: 'Instructions',
+  suggest_ext_close: 'Fermer',
+  suggest_ext_area_label_badge: 'Cuisine',
+  suggest_ext_hint: 'Tapez un ingrédient pour commencer',
+  suggest_ext_ingredient_loading: 'Chargement des ingrédients…',
+  suggest_ext_ingredient_no_match: 'Aucun ingrédient trouvé',
+  suggest_ext_translating: 'Traduction en cours…',
+
   // Profile
   profile_title: 'Profil',
   profile_logout: 'Se déconnecter',
@@ -190,6 +218,16 @@ export const fr = {
 
   // Errors
   error_generic: 'Une erreur est survenue',
+
+  // Confirm modals
+  confirm_cancel: 'Annuler',
+  confirm_delete_recipe_title: 'Supprimer la recette',
+  confirm_delete_recipe_message: 'Cette action est irréversible. La recette sera définitivement supprimée.',
+  confirm_delete_recipe_confirm: 'Supprimer',
+  confirm_leave_group_title: 'Quitter le groupe',
+  confirm_delete_group_title: 'Supprimer le groupe',
+  confirm_delete_group_message: 'Cette action est irréversible. Le groupe et toutes ses données seront supprimés.',
+  confirm_delete_group_confirm: 'Supprimer',
 
   // Stats labels in sheet
   stat_prep: 'Préparation',

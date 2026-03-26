@@ -27,3 +27,8 @@ dinette/
 ├── frontend/    React + Vite SPA
 └── docker-compose.yml
 ```
+
+
+## Ideas you can ADD :
+- Ajout Suggestion en recupérant un API externe
+- 
