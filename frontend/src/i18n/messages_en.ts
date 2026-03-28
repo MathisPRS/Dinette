@@ -169,6 +169,10 @@ export const en: Messages = {
   suggest_ext_ingredient_no_match: 'No ingredient found',
   suggest_ext_translating: 'Translating…',
 
+  // Suggest — source selector
+  suggest_source_mealdb: 'TheMealDB',
+  suggest_source_spoonacular: 'Spoonacular',
+
   // Profile
   profile_title: 'Profile',
   profile_logout: 'Sign out',

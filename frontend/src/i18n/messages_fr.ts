@@ -167,6 +167,10 @@ export const fr = {
   suggest_ext_ingredient_no_match: 'Aucun ingrédient trouvé',
   suggest_ext_translating: 'Traduction en cours…',
 
+  // Suggest — source selector
+  suggest_source_mealdb: 'TheMealDB',
+  suggest_source_spoonacular: 'Spoonacular',
+
   // Profile
   profile_title: 'Profil',
   profile_logout: 'Se déconnecter',

@@ -156,7 +156,8 @@ model GroupMember {
 }
 
 model MealIngredient {
-  id     Int    @id @default(autoincrement())
-  nameEn String @unique
+  id     Int     @id @default(autoincrement())
+  nameEn String  @unique
   nameFr String
+  isMain Boolean @default(false)
 }

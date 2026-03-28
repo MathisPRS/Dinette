@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, ExternalLink, Youtube, ChevronDown } from 'lucide-react';
+import { Search, X, ExternalLink, Youtube } from 'lucide-react';
 import { suggestApi, type MealIngredient } from '@/api/suggest';
 import { recipeApi } from '@/api/recipes';
 import type { ExternalRecipe, Category, RecipeFormData } from '@/types';
@@ -15,7 +15,10 @@ import { useI18nStore } from '@/i18n';
 function mapCategory(mealdbCategory: string): Category {
   const lower = mealdbCategory.toLowerCase();
   if (lower === 'dessert' || lower === 'desserts') return 'DESSERT';
-  if (lower === 'starter' || lower === 'starters' || lower === 'soup' || lower === 'side')
+  if (
+    lower === 'starter' || lower === 'starters' || lower === 'soup' || lower === 'side' ||
+    lower === 'appetizer' || lower === 'snack' || lower === 'salad'
+  )
     return 'STARTER';
   return 'MAIN';
 }
@@ -348,9 +351,9 @@ function DetailModal({ mealId, locale, onClose, onImported }: DetailModalProps) 
                     {t('suggest_ext_watch_youtube')}
                   </a>
                 )}
-                {meal.source && (
+                {meal.sourceUrl && (
                   <a
-                    href={meal.source}
+                    href={meal.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors"
@@ -439,42 +442,22 @@ export function SuggestPage() {
   const [ingredientsLoading, setIngredientsLoading] = useState(true);
   const [selectedIngredient, setSelectedIngredient] = useState<MealIngredient | null>(null);
 
-  // Filter dropdowns
-  const [categories, setCategories] = useState<string[]>([]);
-  const [areas, setAreas] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedArea, setSelectedArea] = useState('');
-
   // Results
   const [results, setResults] = useState<ExternalRecipe[] | null>(null);
   const [translatedTitles, setTranslatedTitles] = useState<Record<string, string>>({});
   const [selectedMealId, setSelectedMealId] = useState<string | null>(null);
 
   // UI state
-  const [loadingMeta, setLoadingMeta] = useState(true);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
 
-  // Load ingredients + categories + areas on mount
+  // Load ingredients on mount
   useEffect(() => {
     setIngredientsLoading(true);
-    setLoadingMeta(true);
-
-    Promise.all([
-      suggestApi.ingredients(),
-      suggestApi.categories(),
-      suggestApi.areas(),
-    ])
-      .then(([ings, cats, ars]) => {
-        setIngredients(ings);
-        setCategories(cats);
-        setAreas(ars);
-      })
+    suggestApi.ingredients()
+      .then((ings) => setIngredients(ings))
       .catch(() => {/* non-blocking */})
-      .finally(() => {
-        setIngredientsLoading(false);
-        setLoadingMeta(false);
-      });
+      .finally(() => setIngredientsLoading(false));
   }, []);
 
   const handleSearch = useCallback(async () => {
@@ -487,8 +470,6 @@ export function SuggestPage() {
     try {
       const meals = await suggestApi.search({
         ingredient: selectedIngredient.nameEn,
-        category: selectedCategory || undefined,
-        area: selectedArea || undefined,
       });
       setResults(meals);
 
@@ -510,7 +491,7 @@ export function SuggestPage() {
     } finally {
       setSearching(false);
     }
-  }, [selectedIngredient, selectedCategory, selectedArea, locale]);
+  }, [selectedIngredient, locale]);
 
   function handleImported(recipeId: string) {
     setSelectedMealId(null);
@@ -538,51 +519,6 @@ export function SuggestPage() {
               onChange={setSelectedIngredient}
             />
           </div>
-
-          {/* Filters */}
-          {!loadingMeta && (
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              {/* Category */}
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
-                  {t('suggest_ext_category_label')}
-                </label>
-                <div className="relative">
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full appearance-none pl-3 pr-8 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-                  >
-                    <option value="">{t('suggest_ext_all_categories')}</option>
-                    {categories.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Area */}
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
-                  {t('suggest_ext_area_label')}
-                </label>
-                <div className="relative">
-                  <select
-                    value={selectedArea}
-                    onChange={(e) => setSelectedArea(e.target.value)}
-                    className="w-full appearance-none pl-3 pr-8 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-                  >
-                    <option value="">{t('suggest_ext_all_areas')}</option>
-                    {areas.map((a) => (
-                      <option key={a} value={a}>{a}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                </div>
-              </div>
-            </div>
-          )}
 
           <Button
             size="md"

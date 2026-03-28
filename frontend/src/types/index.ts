@@ -113,6 +113,7 @@ export interface ExternalIngredient {
 
 export interface ExternalRecipe {
   id: string;
+  source: 'mealdb' | 'spoonacular';
   title: string;
   image: string;
   category: string;
@@ -122,5 +123,5 @@ export interface ExternalRecipe {
   ingredients: ExternalIngredient[];
   tags: string[];
   youtube: string | null;
-  source: string | null;
+  sourceUrl: string | null;
 }

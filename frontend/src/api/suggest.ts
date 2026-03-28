@@ -20,7 +20,7 @@ export const suggestApi = {
 
   detail: (id: string, locale = 'en') =>
     api
-      .get<{ meal: ExternalRecipe }>(`/suggest/detail/${id}`, { params: { locale } })
+      .get<{ meal: ExternalRecipe }>(`/suggest/detail/${encodeURIComponent(id)}`, { params: { locale } })
       .then((r) => r.data.meal),
 
   categories: () =>

@@ -50,6 +50,7 @@ services:
       SEED_USER_PASSWORD: ${SEED_USER_PASSWORD}
       SEED_USER_NAME: ${SEED_USER_NAME}
       LIBRETRANSLATE_URL: http://translate:5000
+      SPOONACULAR_API_KEY: ${SPOONACULAR_API_KEY:-}
     volumes:
       - uploads_data:/app/backend/uploads
     ports:
