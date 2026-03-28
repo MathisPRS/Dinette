@@ -52,7 +52,7 @@ services:
       LIBRETRANSLATE_URL: http://translate:5000
       SPOONACULAR_API_KEY: ${SPOONACULAR_API_KEY:-}
     volumes:
-      - uploads_data:/app/backend/uploads
+      - ./uploads:/app/backend/uploads
     ports:
       - "8041:80"
     depends_on:
@@ -63,5 +63,4 @@ services:
 
 volumes:
   postgres_data:
-  uploads_data:
   libretranslate_data:
