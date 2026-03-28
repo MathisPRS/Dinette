@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --brand-50: #fff0f3;
+  --brand-100: #ffe0e7;
+  --brand-200: #ffc2d0;
+  --brand-300: #ff8da1;
+  --brand-400: #ff6b85;
+  --brand-500: #ff8da1;
+  --brand-600: #e8708a;
+  --brand-700: #c45470;
+  --brand-800: #9e3d57;
+  --brand-900: #7a2d42;
+}
+
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;

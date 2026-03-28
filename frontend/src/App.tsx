@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useAuthStore } from '@/store/auth';
+import { useThemeStore, applyTheme } from '@/store/theme';
 import { LoginPage } from '@/pages/Login';
 import { RegisterPage } from '@/pages/Register';
 import { HomePage } from '@/pages/Home';
@@ -21,6 +23,12 @@ function RequireAuth({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
+  const themeId = useThemeStore((s) => s.themeId);
+
+  useEffect(() => {
+    applyTheme(themeId);
+  }, [themeId]);
+
   return (
     <BrowserRouter>
       <RecipeSheetProvider>

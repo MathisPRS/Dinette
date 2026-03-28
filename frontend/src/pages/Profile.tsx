@@ -2,19 +2,22 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { LogOut, User, Globe, Lock, Eye, EyeOff, ChevronDown, ChevronUp, Fingerprint } from 'lucide-react';
+import { LogOut, User, Globe, Lock, Eye, EyeOff, ChevronDown, ChevronUp, Fingerprint, Palette } from 'lucide-react';
 import { useT, useI18nStore } from '@/i18n';
 import type { Locale } from '@/i18n';
 import { clsx } from 'clsx';
 import { authApi } from '@/api/auth';
 import { webAuthnApi, isBiometricAvailable } from '@/api/webauthn';
 import { extractApiError } from '@/utils';
+import { useThemeStore, THEMES } from '@/store/theme';
+import type { ThemeId } from '@/store/theme';
 
 export function ProfilePage() {
   const navigate = useNavigate();
   const { user, logout, webAuthnRegistered, setWebAuthnRegistered } = useAuthStore();
   const t = useT();
   const { locale, setLocale } = useI18nStore();
+  const { themeId, setTheme } = useThemeStore();
 
   // Change-password state
   const [pwOpen, setPwOpen] = useState(false);
@@ -168,6 +171,30 @@ export function ProfilePage() {
               >
                 {label}
               </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Theme selector */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+          <div className="flex items-center gap-3 mb-3 px-2">
+            <Palette size={18} className="text-gray-500" />
+            <span className="font-medium text-gray-700 text-sm">{t('profile_theme')}</span>
+          </div>
+          <div className="flex gap-3 flex-wrap">
+            {THEMES.map((theme) => (
+              <button
+                key={theme.id}
+                onClick={() => setTheme(theme.id as ThemeId)}
+                title={t(`theme_${theme.id}` as Parameters<typeof t>[0])}
+                className={clsx(
+                  'w-8 h-8 rounded-full transition-transform',
+                  themeId === theme.id
+                    ? 'ring-2 ring-offset-2 ring-gray-400 scale-110'
+                    : 'hover:scale-110'
+                )}
+                style={{ backgroundColor: theme.swatch }}
+              />
             ))}
           </div>
         </div>

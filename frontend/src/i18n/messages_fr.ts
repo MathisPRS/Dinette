@@ -257,6 +257,16 @@ export const fr = {
   stat_cook: 'Cuisson',
   stat_servings: 'Portions',
   stat_total: 'Total',
+
+  // Theme
+  profile_theme: 'Couleur de l\'application',
+  theme_rose: 'Rose',
+  theme_orange: 'Orange',
+  theme_red: 'Rouge',
+  theme_purple: 'Violet',
+  theme_blue: 'Bleu',
+  theme_green: 'Vert',
+  theme_black: 'Noir',
 } as const;
 
 export type Messages = Record<keyof typeof fr, string>;

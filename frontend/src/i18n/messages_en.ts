@@ -259,4 +259,14 @@ export const en: Messages = {
   stat_cook: 'Cook',
   stat_servings: 'Servings',
   stat_total: 'Total',
+
+  // Theme
+  profile_theme: 'App colour',
+  theme_rose: 'Rose',
+  theme_orange: 'Orange',
+  theme_red: 'Red',
+  theme_purple: 'Purple',
+  theme_blue: 'Blue',
+  theme_green: 'Green',
+  theme_black: 'Black',
 };
