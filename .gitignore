@@ -21,7 +21,6 @@ uploads/*
 data/postgres/*
 data/libretranslate/*
 data/uploads/*
-!data/postgres/.gitkeep
 !data/libretranslate/.gitkeep
 !data/uploads/.gitkeep
 
