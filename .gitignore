@@ -12,10 +12,18 @@ frontend/node_modules/
 backend/dist/
 frontend/dist/
 
-# Uploads
+# Uploads (ancien chemin)
 backend/uploads/
 uploads/*
 !uploads/.gitkeep
+
+# Data (bind mounts — contenu ignoré, structure tracée)
+data/postgres/*
+data/libretranslate/*
+data/uploads/*
+!data/postgres/.gitkeep
+!data/libretranslate/.gitkeep
+!data/uploads/.gitkeep
 
 # Prisma
 backend/prisma/*.db

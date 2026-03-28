@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -23,7 +23,7 @@ services:
       LT_DISABLE_FILES_TRANSLATION: "true"
       LT_ARGOS_PACKAGES_DIR: /app/db/argos-translate/packages
     volumes:
-      - libretranslate_data:/app/db
+      - ./data/libretranslate:/app/db
 
   app:
     build:
@@ -52,7 +52,7 @@ services:
       LIBRETRANSLATE_URL: http://translate:5000
       SPOONACULAR_API_KEY: ${SPOONACULAR_API_KEY:-}
     volumes:
-      - ./uploads:/app/backend/uploads
+      - ./data/uploads:/app/backend/uploads
     ports:
       - "8041:80"
     depends_on:
@@ -60,7 +60,3 @@ services:
         condition: service_healthy
       translate:
         condition: service_started
-
-volumes:
-  postgres_data:
-  libretranslate_data:

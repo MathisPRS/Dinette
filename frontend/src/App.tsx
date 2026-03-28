@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/auth';
-import { useThemeStore, applyTheme } from '@/store/theme';
+import { useThemeStore, applyTheme, THEMES } from '@/store/theme';
 import { LoginPage } from '@/pages/Login';
 import { RegisterPage } from '@/pages/Register';
 import { HomePage } from '@/pages/Home';
@@ -27,6 +27,12 @@ export default function App() {
 
   useEffect(() => {
     applyTheme(themeId);
+    // Update browser/PWA theme-color meta tag to match
+    const palette = THEMES.find((t) => t.id === themeId);
+    if (palette) {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', palette.vars['--brand-600']);
+    }
   }, [themeId]);
 
   return (
